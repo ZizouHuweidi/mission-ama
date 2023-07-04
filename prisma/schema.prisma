@@ -9,3 +9,64 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+
+enum PURPOSE {
+  audit 
+  visit
+  inspection
+  client
+}
+
+enum DEPARTMENT {
+ financial
+ commercial 
+ construction
+ HR
+ DG
+ quality
+ achat
+}
+
+enum TRANSPORT {
+  car
+  bus
+  train
+  taxi
+  flight
+}
+
+enum OCCUPATION {
+  something 
+  something2
+}
+
+
+model Mission {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  date DateTime
+  employee Employee
+  external Boolean @default(false)
+  department DEPARTMENT
+  destination String
+  purpose PURPOSE
+  transport TRANSPORT
+  visa String?
+  cost Int
+  }
+
+
+
+
+model Employee {
+  id        String    @id @default(uuid())
+  name String 
+  phone Int
+  occupation OCCUPATION
+  CSP  Boolean @default(true)
+  email  String    @unique
+  vaccinations String[]
+
+}
+
