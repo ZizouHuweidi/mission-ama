@@ -10,22 +10,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 enum PURPOSE {
-  audit 
+  audit
   visit
   inspection
   client
 }
 
 enum DEPARTMENT {
- financial
- commercial 
- construction
- HR
- DG
- quality
- achat
+  financial
+  commercial
+  construction
+  HR
+  DG
+  quality
+  achat
 }
 
 enum TRANSPORT {
@@ -37,36 +36,52 @@ enum TRANSPORT {
 }
 
 enum OCCUPATION {
-  something 
+  something
   something2
 }
 
-
 model Mission {
-  id        String    @id @default(uuid())
-  createdAt DateTime  @default(now())
-  date DateTime
-  employee Employee
-  external Boolean @default(false)
-  department DEPARTMENT
-  destination String
-  purpose PURPOSE
-  transport TRANSPORT
-  visa String?
-  cost Int
-  }
-
-
-
-
-model Employee {
-  id        String    @id @default(uuid())
-  name String 
-  phone Int
-  occupation OCCUPATION
-  CSP  Boolean @default(true)
-  email  String    @unique
-  vaccinations String[]
-
+  id           String     @id @default(uuid())
+  createdAt    DateTime   @default(now())
+  startDate    DateTime
+  endDate      DateTime
+  employee     Employee   @relation(fields: [employeeId], references: [id])
+  employeeId   String
+  participants Employee[]
+  project      Project    @relation(fields: [projectId], references: [id])
+  projectId    String
+  department   DEPARTMENT
+  destination  String
+  purpose      PURPOSE
+  transport    TRANSPORT
+  fuel         Int?
+  external     Boolean    @default(false)
+  visa         Int?
+  vaccination  Int?
+  tests        Int?
+  timbre       Int?
+  other_costs  Int?
+  cost         Int
 }
 
+model Employee {
+  id           String     @id @default(uuid())
+  name         String
+  phone        Int
+  occupation   OCCUPATION
+  CSP          Boolean    @default(true)
+  email        String     @unique
+  Mission      Mission[]
+  supervisor   Employee   @relation(fields: [superviseeId], references: [id])
+  supervisee   Employee[]
+  superviseeId String
+  projects     Project[]
+}
+
+model Project {
+  id          String     @id @default(uuid())
+  name        String
+  description String
+  Missions    Mission[]
+  employees   Employee[]
+}
