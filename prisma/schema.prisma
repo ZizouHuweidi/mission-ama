@@ -35,51 +35,52 @@ enum TRANSPORT {
   flight
 }
 
-enum OCCUPATION {
-  something
-  something2
-}
+// enum OCCUPATION {
+//   something
+//   something2
+// }
 
 model Mission {
-  id           String     @id @default(uuid())
-  createdAt    DateTime   @default(now())
+  id           Int       @id @default(autoincrement())
+  createdAt    DateTime  @default(now())
   startDate    DateTime
   endDate      DateTime
-  employee     Employee   @relation(fields: [employeeId], references: [id])
-  employeeId   String
-  participants Employee[]
-  project      Project    @relation(fields: [projectId], references: [id])
-  projectId    String
-  department   DEPARTMENT
+  employee     Employee  @relation(fields: [employeeId], references: [id])
+  employeeId   Int
+  participants String[]
+  project      Project?  @relation(fields: [projectId], references: [id])
+  projectId    Int?
   destination  String
   purpose      PURPOSE
   transport    TRANSPORT
   fuel         Int?
-  external     Boolean    @default(false)
+  external     Boolean   @default(false)
   visa         Int?
   vaccination  Int?
   tests        Int?
   timbre       Int?
   other_costs  Int?
-  cost         Int
+  // cost         Int
 }
 
 model Employee {
-  id           String     @id @default(uuid())
+  id           Int        @id @default(autoincrement())
   name         String
   phone        Int
-  occupation   OCCUPATION
+  // occupation   OCCUPATION
   CSP          Boolean    @default(true)
   email        String     @unique
-  Mission      Mission[]
-  supervisor   Employee   @relation(fields: [superviseeId], references: [id])
-  supervisee   Employee[]
-  superviseeId String
+  password     String
+  Missions     Mission[]
+  department   DEPARTMENT
+  supervisorId Int?
+  supervisor   Employee?  @relation("supervisorEmployee", fields: [supervisorId], references: [id])
+  supervisee   Employee[] @relation("supervisorEmployee")
   projects     Project[]
 }
 
 model Project {
-  id          String     @id @default(uuid())
+  id          Int        @id @default(autoincrement())
   name        String
   description String
   Missions    Mission[]

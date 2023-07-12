@@ -1,12 +1,10 @@
 
 import { Router } from 'express'
-import { body, oneOf, validationResult } from "express-validator"
-import { deleteMember, getOneMember, getMembers, updateMember } from './controllers/member'
-import { createActivity, deleteActivity, getOneActivity, getActivities, updateActivity } from './controllers/activity'
-import { takeAttendance, updateAttendance, deleteAttendance, getMemberAttendance, getActivityAttendance, getAllAttendance } from './controllers/attendance'
-import { createReceipt, getReceipts, getOneReceipt, updateReceipt, deleteReceipt } from './controllers/receipt'
-import { createNotification, deleteNotification, getOneNotification, getNotifications, updateNotification } from './controllers/notification'
-import { handleInputErrors } from './modules/middleware'
+// import { body, oneOf, validationResult } from "express-validator"
+import { createMission, getMissions, getOneMission, updateMission, deleteMission } from './controllers/mission'
+import { getEmployees, getOneEmployee, createEmployee, updateEmployee, deleteEmployee } from './controllers/employee'
+import { getProjects, createProject, deleteProject, getOneProject, updateProject } from './controllers/project'
+// import { handleInputErrors } from './modules/middleware'
 
 
 //TODO: Finish all needed validation and error handeling
@@ -14,55 +12,33 @@ import { handleInputErrors } from './modules/middleware'
 const router = Router()
 
 /**
- * Member
+ * Mission
  */
-router.get('/member', getMembers)
-router.get('/member/:id', getOneMember)
-router.patch('/member/:id', updateMember)
-router.delete('/member/:id', deleteMember)
+router.get('/mission', getMissions)
+router.get('/mission/:id', getOneMission)
+router.post('/mission', createMission)
+router.patch('/member/:id', updateMission)
+router.delete('/member/:id', deleteMission)
 
 /**
- * Activity
+ * Employee
  */
 
-router.post('/activity', createActivity)
-router.get('/activity', getActivities)
-router.get('/activity/:id', getOneActivity)
-router.patch('/activity/:id', updateActivity)
-router.delete('/activity/:id', deleteActivity)
+router.post('/employee', createEmployee)
+router.get('/employee', getEmployees)
+router.get('/employee/:id', getOneEmployee)
+router.patch('/employee/:id', updateEmployee)
+router.delete('/employee/:id', deleteEmployee)
 
 /**
- * Attendance
+ * Project
  */
 
-router.post('/attendance', takeAttendance)
-router.get('/attendance', getAllAttendance)
-router.get('/attendance/:id', getActivityAttendance)
-router.get('/attendance/member/:id', getMemberAttendance)
-router.patch('/attendance/:id', updateAttendance)
-router.delete('/attendance/:id', deleteAttendance)
+router.post('/project', createProject)
+router.get('/project', getProjects)
+router.get('/project/:id', getOneProject)
+router.patch('/project/:id', updateProject)
+router.delete('/project/:id', deleteProject)
 
-
-
-/**
- * Receipt
- */
-router.post('/receipt', createReceipt)
-router.get('/receipt', getReceipts)
-router.get('/receipt/:id', getOneReceipt)
-router.patch('/receipt/:id', updateReceipt)
-router.delete('/receipt/:id', deleteReceipt)
-
-
-
-/**
- * notifications
- */
-// TODO: Fininsh notification implementation
-router.post('/notification', createNotification)
-router.get('/notification', getNotifications)
-router.get('/notification/:id', getOneNotification)
-router.patch('/notification/:id', updateNotification)
-router.delete('/notification/:id', deleteNotification)
 
 export default router

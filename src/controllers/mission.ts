@@ -1,35 +1,36 @@
 import prisma from "../db"
 
-export const createActivity = async (req, res) => {
-  const { name, description, location, date, type } = req.body
+export const createMission = async (req, res) => {
+  const { startDate, endDate, destination, purpose, transport, employeeId } = req.body
   try {
-    const activity = await prisma.activity.create({
+    const mission = await prisma.mission.create({
       data: {
-        name: name,
-        description: description,
-        location: location,
-        date: date,
-        type: type,
+        startDate: startDate,
+        endDate: endDate,
+        destination: destination,
+        purpose: purpose,
+        transport: transport,
+        employeeId: employeeId
       },
     });
-    res.status(201).json(activity)
+    res.status(201).json(mission)
   } catch (error) {
     res.status(400).json({ msg: error.message })
   }
 }
 
-export const getActivities = async (req, res) => {
+export const getMissions = async (req, res) => {
   try {
-    const response = await prisma.activity.findMany()
+    const response = await prisma.mission.findMany()
     res.status(200).json(response)
   } catch (error) {
     res.status(500).json({ msg: error.message })
   }
 }
 
-export const getOneActivity = async (req, res) => {
+export const getOneMission = async (req, res) => {
   try {
-    const response = await prisma.activity.findUnique({
+    const response = await prisma.mission.findUnique({
       where: {
         id: Number(req.params.id),
       },
@@ -41,35 +42,31 @@ export const getOneActivity = async (req, res) => {
 }
 
 
-export const updateActivity = async (req, res) => {
-  const { name, description, location, date, type } = req.body
+export const updateMission = async (req, res) => {
+  // const { name, description, location, date, type } = req.body
   try {
-    const activity = await prisma.activity.update({
+    const mission = await prisma.mission.update({
       where: {
         id: Number(req.params.id),
       },
       data: {
-        name: name,
-        description: description,
-        location: location,
-        date: date,
-        type: type
+
       },
     })
-    res.status(200).json(activity)
+    res.status(200).json(mission)
   } catch (error) {
     res.status(400).json({ msg: error.message })
   }
 }
 
-export const deleteActivity = async (req, res) => {
+export const deleteMission = async (req, res) => {
   try {
-    const activity = await prisma.activity.delete({
+    const mission = await prisma.mission.delete({
       where: {
         id: Number(req.params.id),
       },
     })
-    res.status(200).json(activity)
+    res.status(200).json(mission)
   } catch (error) {
     res.status(400).json({ msg: error.message })
   }

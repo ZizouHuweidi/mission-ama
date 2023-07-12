@@ -1,40 +1,30 @@
 import prisma from '../db'
 import { comparePasswords, createJWT, hashPassword } from '../modules/auth'
 
-export const createMember = async (req, res) => {
+export const createEmployee = async (req, res) => {
 
-  const { email, password, role, firstName, lastName, gender, dob, phone, address, startedAt, bio, membershipFee, membershipPaid, actvitiesAttended } = req.body
+  const { email, password, name } = req.body
 
-  const member = await prisma.member.create({
+  const employee = await prisma.employee.create({
     data: {
       email: email,
       password: await hashPassword(password),
-      role: role,
-      firstName: firstName,
-      lastName: lastName,
-      gender: gender,
-      dob: dob,
-      phone: phone,
-      address: address,
-      startedAt: startedAt,
-      bio: bio,
-      membershipFee: membershipFee,
-      membershipPaid: membershipPaid,
+      name: name,
     }
   })
 
-  const token = createJWT(member)
+  const token = createJWT(employee)
   res.json({ token })
 }
 
 export const signin = async (req, res) => {
-  const member = await prisma.member.findUnique({
+  const employee = await prisma.employee.findUnique({
     where: {
       email: req.body.email
     }
   })
 
-  const isValid = await comparePasswords(req.body.password, member.password)
+  const isValid = await comparePasswords(req.body.password, employee.password)
 
   if (!isValid) {
     res.status(401)
@@ -42,16 +32,16 @@ export const signin = async (req, res) => {
     return
   }
 
-  const token = createJWT(member)
+  const token = createJWT(employee)
   res.json({ token })
 }
 
 // Get all
-export const getMembers = async (req, res) => {
+export const getEmployees = async (req, res) => {
   try {
-    const member = await prisma.member.findMany()
+    const employee = await prisma.employee.findMany()
 
-    res.json(member)
+    res.json(employee)
   } catch (error) {
     res.status(500).json({
       message: "stinky poo poo"
@@ -60,9 +50,9 @@ export const getMembers = async (req, res) => {
 }
 
 // Get one
-export const getOneMember = async (req, res) => {
+export const getOneEmployee = async (req, res) => {
   const { id } = req.params
-  const member = await prisma.member.findFirst({
+  const member = await prisma.employee.findFirst({
     where: { id: Number(id) },
   })
   res.json({
@@ -72,36 +62,29 @@ export const getOneMember = async (req, res) => {
 
 
 // Update one
-export const updateMember = async (req, res) => {
-  const { email, role, firstName, lastName, dob, phone, membershipFee } = req.body
+export const updateEmployee = async (req, res) => {
+  // const { email, role, firstName, lastName, dob, phone, membershipFee } = req.body
   try {
-    const member = await prisma.member.update({
+    const employee = await prisma.employee.update({
       where: {
         id: Number(req.params.id),
       },
       data: {
-        email: email,
-        role: role,
-        firstName: firstName,
-        lastName: lastName,
-        dob: dob,
-        phone: phone,
-        membershipFee: membershipFee,
       },
     })
-    res.status(200).json(member)
+    res.status(200).json(employee)
   } catch (error) {
     res.status(400).json({ msg: error.message })
   }
 }
 
 // Delete one
-export const deleteMember = async (req, res) => {
+export const deleteEmployee = async (req, res) => {
   const { id } = req.params
-  const member = await prisma.member.delete({
+  const employee = await prisma.employee.delete({
     where: {
       id: Number(id),
     },
   })
-  res.json(member)
+  res.json(employee)
 }
