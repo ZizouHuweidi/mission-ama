@@ -9,10 +9,10 @@ export const hashPassword = (password) => {
   return bcrypt.hash(password, 5)
 }
 
-export const createJWT = (member) => {
+export const createJWT = (employee) => {
   const token = jwt.sign({
-    id: member.id,
-    email: member.email
+    id: employee.id,
+    email: employee.email
   },
     process.env.JWT_SECRET
   )
@@ -37,8 +37,8 @@ export const protect = (req, res, next) => {
   }
 
   try {
-    const member = jwt.verify(token, process.env.JWT_SECRET)
-    req.member = member
+    const employee = jwt.verify(token, process.env.JWT_SECRET)
+    req.employee = employee
     next()
   } catch (e) {
     console.error(e)

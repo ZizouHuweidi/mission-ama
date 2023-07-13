@@ -1,10 +1,10 @@
 
 import { Router } from 'express'
-// import { body, oneOf, validationResult } from "express-validator"
+import { body, oneOf, validationResult } from "express-validator"
 import { createMission, getMissions, getOneMission, updateMission, deleteMission } from './controllers/mission'
 import { getEmployees, getOneEmployee, createEmployee, updateEmployee, deleteEmployee } from './controllers/employee'
 import { getProjects, createProject, deleteProject, getOneProject, updateProject } from './controllers/project'
-// import { handleInputErrors } from './modules/middleware'
+import { handleInputErrors } from './modules/middleware'
 
 
 //TODO: Finish all needed validation and error handeling
@@ -17,14 +17,13 @@ const router = Router()
 router.get('/mission', getMissions)
 router.get('/mission/:id', getOneMission)
 router.post('/mission', createMission)
-router.patch('/member/:id', updateMission)
-router.delete('/member/:id', deleteMission)
+router.patch('/mission/:id', updateMission)
+router.delete('/mission/:id', deleteMission)
 
 /**
  * Employee
  */
 
-router.post('/employee', createEmployee)
 router.get('/employee', getEmployees)
 router.get('/employee/:id', getOneEmployee)
 router.patch('/employee/:id', updateEmployee)

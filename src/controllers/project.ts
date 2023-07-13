@@ -1,11 +1,12 @@
 import prisma from "../db"
 
 export const createProject = async (req, res) => {
-  const { startDate, endDate, destination, purpose, transport, employeeId } = req.body
+  const { name, description } = req.body
   try {
     const project = await prisma.project.create({
       data: {
-
+        name: name,
+        description: description
       },
     });
     res.status(201).json(project)
@@ -38,14 +39,15 @@ export const getOneProject = async (req, res) => {
 
 
 export const updateProject = async (req, res) => {
-  // const { name, description, location, date, type } = req.body
+  const { name, description } = req.body
   try {
     const project = await prisma.project.update({
       where: {
         id: Number(req.params.id),
       },
       data: {
-
+        name: name,
+        description: description
       },
     })
     res.status(200).json(project)

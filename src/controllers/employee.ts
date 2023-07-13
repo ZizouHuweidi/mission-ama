@@ -3,13 +3,17 @@ import { comparePasswords, createJWT, hashPassword } from '../modules/auth'
 
 export const createEmployee = async (req, res) => {
 
-  const { email, password, name } = req.body
+  const { name, phone, CSP, email, password, department, supervisorId } = req.body
 
   const employee = await prisma.employee.create({
     data: {
       email: email,
       password: await hashPassword(password),
       name: name,
+      phone: phone,
+      CSP: CSP,
+      department: department,
+      supervisorId: supervisorId
     }
   })
 
@@ -52,24 +56,31 @@ export const getEmployees = async (req, res) => {
 // Get one
 export const getOneEmployee = async (req, res) => {
   const { id } = req.params
-  const member = await prisma.employee.findFirst({
+  const employee = await prisma.employee.findFirst({
     where: { id: Number(id) },
   })
   res.json({
-    member
+    employee
   })
 }
 
 
 // Update one
 export const updateEmployee = async (req, res) => {
-  // const { email, role, firstName, lastName, dob, phone, membershipFee } = req.body
+  const { name, phone, CSP, email, password, department, supervisorId } = req.body
   try {
     const employee = await prisma.employee.update({
       where: {
         id: Number(req.params.id),
       },
       data: {
+        email: email,
+        password: await hashPassword(password),
+        name: name,
+        phone: phone,
+        CSP: CSP,
+        department: department,
+        supervisorId: supervisorId
       },
     })
     res.status(200).json(employee)
