@@ -73,6 +73,7 @@ model Employee {
   password     String
   Missions     Mission[]
   department   DEPARTMENT
+  // admin     Boolean 
   supervisorId Int?
   supervisor   Employee?  @relation("supervisorEmployee", fields: [supervisorId], references: [id])
   supervisee   Employee[] @relation("supervisorEmployee")
