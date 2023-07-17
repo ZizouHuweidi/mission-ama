@@ -7,7 +7,11 @@ import { createEmployee, signin } from './controllers/employee'
 
 const app = express()
 
-app.use(cors())
+const corsOption = {
+  origin: ['http://localhost:3000'],
+};
+
+app.use(cors(corsOption))
 app.use(morgan('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))

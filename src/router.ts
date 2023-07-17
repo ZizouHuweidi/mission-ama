@@ -26,6 +26,7 @@ router.delete('/mission/:id', deleteMission)
 
 router.get('/employee', getEmployees)
 router.get('/employee/:id', getOneEmployee)
+// router.get('/auth/employee/:id', logout)
 router.patch('/employee/:id', updateEmployee)
 router.delete('/employee/:id', deleteEmployee)
 
