@@ -1,0 +1,83 @@
+{{define "content"}} {{- if not (eq .HTMX.Request.Target "posts")}} {{template
+"top-content" .}} {{- end}} {{- if not (eq .HTMX.Request.Target "posts")}}
+{{template "mission-table" .}} {{- end}} {{end}} {{define "top-content"}}
+
+<section class="section">
+  <h1 class="title">Recent missions</h1>
+</section>
+{{end}} {{define "posts"}}
+<div id="posts">
+  {{- range .Data}}
+  <article class="media">
+    <figure class="media-left">
+      <p class="image is-64x64">
+        <img src="{{file "gopher.png"}}" alt="Gopher"/>
+      </p>
+    </figure>
+    <div class="media-content">
+      <div class="content">
+        <p>
+          <strong>{{.Title}}</strong>
+          <br />
+          {{.Body}}
+        </p>
+      </div>
+    </div>
+  </article>
+  {{- end}}
+
+  <div class="field is-grouped is-grouped-centered">
+    {{- if not $.Pager.IsBeginning}}
+    <p class="control">
+      <button
+        class="button is-primary"
+        hx-swap="outerHTML"
+        hx-get="/?page={{sub $.Pager.Page 1}}"
+        hx-target="#posts"
+      >
+        Previous page
+      </button>
+    </p>
+    {{- end}} {{- if not $.Pager.IsEnd}}
+    <p class="control">
+      <button
+        class="button is-primary"
+        hx-swap="outerHTML"
+        hx-get="/?page={{add $.Pager.Page 1}}"
+        hx-target="#posts"
+      >
+        Next page
+      </button>
+    </p>
+    {{- end}}
+  </div>
+</div>
+{{end}} {{define "mission-table"}}
+<table class="table">
+  <thead>
+    <tr>
+      <th>Start Date</th>
+      <th>End Date</th>
+      <th>Department</th>
+      <th>Type</th>
+      <th>External</th>
+      <th>Employee</th>
+      <th>Destination</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{- range .Data}}
+    <tr>
+      <th>1</th>
+      <td>{{.Title}}</td>
+      <td>{{.Body}}</td>
+      <td>20</td>
+      <td>11</td>
+      <td>7</td>
+      <td>65</td>
+    </tr>
+
+    {{- end}}
+  </tbody>
+</table>
+{{end}}

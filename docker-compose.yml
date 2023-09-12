@@ -1,25 +1,17 @@
-version: '3.5'
+version: "3"
 
 services:
-  postgres:
-    container_name: mission-ama-postgres
-    image: postgres
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      PGDATA: /data/postgres
-    volumes:
-       - postgres:/data/postgres
+  cache:
+    image: "redis:alpine"
+    container_name: mission_ama_cache
     ports:
-      - "5432:5432"
-    networks:
-      - postgres
-    restart: unless-stopped
-  
-
-networks:
-  postgres:
-    driver: bridge
-
-volumes:
-    postgres:
+      - "127.0.0.1:6379:6379"
+  db:
+    image: postgres:alpine
+    container_name: mission_ama_db
+    ports:
+      - "127.0.0.1:5432:5432"
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=mission_ama

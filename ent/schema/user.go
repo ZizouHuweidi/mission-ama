@@ -1,0 +1,74 @@
+package schema
+
+import (
+	"context"
+	"strings"
+	"time"
+
+	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
+	"entgo.io/ent/schema/field"
+
+	ge "github.com/zizouhuweidi/mission-ama/ent"
+	"github.com/zizouhuweidi/mission-ama/ent/hook"
+)
+
+// User holds the schema definition for the User entity.
+type User struct {
+	ent.Schema
+}
+
+// Fields of the User.
+func (User) Fields() []ent.Field {
+	return []ent.Field{
+		field.String("name").
+			NotEmpty(),
+		field.String("email").
+			NotEmpty().
+			Unique(),
+		field.String("password").
+			Sensitive().
+			NotEmpty(),
+		field.Int("phone").
+			Optional(),
+		field.Bool("admin").
+			Default(false),
+		field.Bool("verified").
+			Default(false),
+		field.String("department").Optional(),
+		field.Time("created_at").
+			Default(time.Now).
+			Immutable(),
+	}
+}
+
+// Edges of the User.
+func (User) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.From("owner", PasswordToken.Type).
+			Ref("user"),
+		edge.To("missions", Mission.Type),
+		edge.To("projects", Project.Type),
+		edge.To("supervisor", User.Type).
+			From("supervisee").
+			Unique(),
+	}
+}
+
+// Hooks of the User.
+func (User) Hooks() []ent.Hook {
+	return []ent.Hook{
+		hook.On(
+			func(next ent.Mutator) ent.Mutator {
+				return hook.UserFunc(func(ctx context.Context, m *ge.UserMutation) (ent.Value, error) {
+					if v, exists := m.Email(); exists {
+						m.SetEmail(strings.ToLower(v))
+					}
+					return next.Mutate(ctx, m)
+				})
+			},
+			// Limit the hook only for these operations.
+			ent.OpCreate|ent.OpUpdate|ent.OpUpdateOne,
+		),
+	}
+}
