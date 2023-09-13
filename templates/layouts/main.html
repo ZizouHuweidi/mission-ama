@@ -23,18 +23,22 @@
                         <p class="menu-label">General</p>
                         <ul class="menu-list">
                             <li>{{link (call .ToURL "home") "Home" .Path}}</li>
-                            <li>{{link (call .ToURL "about") "Missions" .Path}}</li>
-                            <li>{{link (call .ToURL "contact") "Projects" .Path}}</li>
+                            <li>{{link (call .ToURL "missions") "Missions" .Path}}</li>
 
+                            {{- if .IsAuth}}
+                            <li>{{link (call .ToURL "employees") "Employees" .Path}}</li>
+                            <li>{{link (call .ToURL "projects") "Projects" .Path}}</li>
+
+                            {{- end}}
                         </ul>
 
                             {{- if .IsAuth}}
 
                         <p class="menu-label">Pages</p>
                         <ul class="menu-list">
-                                <li>{{link (call .ToURL "logout") "New Mission" .Path}}</li>
-                                <li>{{link (call .ToURL "login") "New Project" .Path}}</li>
-                                <li>{{link (call .ToURL "register") "New Employee" .Path}}</li>
+                                <li>{{link (call .ToURL "newMission") "New Mission" .Path}}</li>
+                                <li>{{link (call .ToURL "newProject") "New Project" .Path}}</li>
+                                <li>{{link (call .ToURL "newEmployee") "New Employee" .Path}}</li>
                             {{- end}}
                         </ul>
                         <p class="menu-label">Account</p>
@@ -66,32 +70,3 @@
         {{template "footer" .}}
     </body>
 </html>
-
-{{define "search"}}
-    <div class="search mr-2 mt-1" x-data="{modal:false}">
-        <input class="input" type="search" placeholder="Search..." @click="modal = true; $nextTick(() => $refs.input.focus());"/>
-        <div class="modal" :class="modal ? 'is-active' : ''" x-show="modal == true">
-            <div class="modal-background"></div>
-            <div class="modal-content" @click.away="modal = false;">
-                <div class="box">
-                    <h2 class="subtitle">Search</h2>
-                    <p class="control">
-                        <input
-                            hx-get="{{call .ToURL "search"}}"
-                            hx-trigger="keyup changed delay:500ms"
-                            hx-target="#results"
-                            name="query"
-                            class="input"
-                            type="search"
-                            placeholder="Search..."
-                            x-ref="input"
-                        />
-                    </p>
-                    <div class="block"></div>
-                    <div id="results"></div>
-                </div>
-            </div>
-            <button class="modal-close is-large" aria-label="close"></button>
-        </div>
-    </div>
-{{end}}

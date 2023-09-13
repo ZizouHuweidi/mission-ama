@@ -70,11 +70,6 @@ func Password(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldPassword, v))
 }
 
-// Phone applies equality check predicate on the "phone" field. It's identical to PhoneEQ.
-func Phone(v int) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldPhone, v))
-}
-
 // Admin applies equality check predicate on the "admin" field. It's identical to AdminEQ.
 func Admin(v bool) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldAdmin, v))
@@ -83,11 +78,6 @@ func Admin(v bool) predicate.User {
 // Verified applies equality check predicate on the "verified" field. It's identical to VerifiedEQ.
 func Verified(v bool) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldVerified, v))
-}
-
-// Department applies equality check predicate on the "department" field. It's identical to DepartmentEQ.
-func Department(v string) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldDepartment, v))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
@@ -290,56 +280,6 @@ func PasswordContainsFold(v string) predicate.User {
 	return predicate.User(sql.FieldContainsFold(FieldPassword, v))
 }
 
-// PhoneEQ applies the EQ predicate on the "phone" field.
-func PhoneEQ(v int) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldPhone, v))
-}
-
-// PhoneNEQ applies the NEQ predicate on the "phone" field.
-func PhoneNEQ(v int) predicate.User {
-	return predicate.User(sql.FieldNEQ(FieldPhone, v))
-}
-
-// PhoneIn applies the In predicate on the "phone" field.
-func PhoneIn(vs ...int) predicate.User {
-	return predicate.User(sql.FieldIn(FieldPhone, vs...))
-}
-
-// PhoneNotIn applies the NotIn predicate on the "phone" field.
-func PhoneNotIn(vs ...int) predicate.User {
-	return predicate.User(sql.FieldNotIn(FieldPhone, vs...))
-}
-
-// PhoneGT applies the GT predicate on the "phone" field.
-func PhoneGT(v int) predicate.User {
-	return predicate.User(sql.FieldGT(FieldPhone, v))
-}
-
-// PhoneGTE applies the GTE predicate on the "phone" field.
-func PhoneGTE(v int) predicate.User {
-	return predicate.User(sql.FieldGTE(FieldPhone, v))
-}
-
-// PhoneLT applies the LT predicate on the "phone" field.
-func PhoneLT(v int) predicate.User {
-	return predicate.User(sql.FieldLT(FieldPhone, v))
-}
-
-// PhoneLTE applies the LTE predicate on the "phone" field.
-func PhoneLTE(v int) predicate.User {
-	return predicate.User(sql.FieldLTE(FieldPhone, v))
-}
-
-// PhoneIsNil applies the IsNil predicate on the "phone" field.
-func PhoneIsNil() predicate.User {
-	return predicate.User(sql.FieldIsNull(FieldPhone))
-}
-
-// PhoneNotNil applies the NotNil predicate on the "phone" field.
-func PhoneNotNil() predicate.User {
-	return predicate.User(sql.FieldNotNull(FieldPhone))
-}
-
 // AdminEQ applies the EQ predicate on the "admin" field.
 func AdminEQ(v bool) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldAdmin, v))
@@ -358,81 +298,6 @@ func VerifiedEQ(v bool) predicate.User {
 // VerifiedNEQ applies the NEQ predicate on the "verified" field.
 func VerifiedNEQ(v bool) predicate.User {
 	return predicate.User(sql.FieldNEQ(FieldVerified, v))
-}
-
-// DepartmentEQ applies the EQ predicate on the "department" field.
-func DepartmentEQ(v string) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldDepartment, v))
-}
-
-// DepartmentNEQ applies the NEQ predicate on the "department" field.
-func DepartmentNEQ(v string) predicate.User {
-	return predicate.User(sql.FieldNEQ(FieldDepartment, v))
-}
-
-// DepartmentIn applies the In predicate on the "department" field.
-func DepartmentIn(vs ...string) predicate.User {
-	return predicate.User(sql.FieldIn(FieldDepartment, vs...))
-}
-
-// DepartmentNotIn applies the NotIn predicate on the "department" field.
-func DepartmentNotIn(vs ...string) predicate.User {
-	return predicate.User(sql.FieldNotIn(FieldDepartment, vs...))
-}
-
-// DepartmentGT applies the GT predicate on the "department" field.
-func DepartmentGT(v string) predicate.User {
-	return predicate.User(sql.FieldGT(FieldDepartment, v))
-}
-
-// DepartmentGTE applies the GTE predicate on the "department" field.
-func DepartmentGTE(v string) predicate.User {
-	return predicate.User(sql.FieldGTE(FieldDepartment, v))
-}
-
-// DepartmentLT applies the LT predicate on the "department" field.
-func DepartmentLT(v string) predicate.User {
-	return predicate.User(sql.FieldLT(FieldDepartment, v))
-}
-
-// DepartmentLTE applies the LTE predicate on the "department" field.
-func DepartmentLTE(v string) predicate.User {
-	return predicate.User(sql.FieldLTE(FieldDepartment, v))
-}
-
-// DepartmentContains applies the Contains predicate on the "department" field.
-func DepartmentContains(v string) predicate.User {
-	return predicate.User(sql.FieldContains(FieldDepartment, v))
-}
-
-// DepartmentHasPrefix applies the HasPrefix predicate on the "department" field.
-func DepartmentHasPrefix(v string) predicate.User {
-	return predicate.User(sql.FieldHasPrefix(FieldDepartment, v))
-}
-
-// DepartmentHasSuffix applies the HasSuffix predicate on the "department" field.
-func DepartmentHasSuffix(v string) predicate.User {
-	return predicate.User(sql.FieldHasSuffix(FieldDepartment, v))
-}
-
-// DepartmentIsNil applies the IsNil predicate on the "department" field.
-func DepartmentIsNil() predicate.User {
-	return predicate.User(sql.FieldIsNull(FieldDepartment))
-}
-
-// DepartmentNotNil applies the NotNil predicate on the "department" field.
-func DepartmentNotNil() predicate.User {
-	return predicate.User(sql.FieldNotNull(FieldDepartment))
-}
-
-// DepartmentEqualFold applies the EqualFold predicate on the "department" field.
-func DepartmentEqualFold(v string) predicate.User {
-	return predicate.User(sql.FieldEqualFold(FieldDepartment, v))
-}
-
-// DepartmentContainsFold applies the ContainsFold predicate on the "department" field.
-func DepartmentContainsFold(v string) predicate.User {
-	return predicate.User(sql.FieldContainsFold(FieldDepartment, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -490,29 +355,6 @@ func HasOwner() predicate.User {
 func HasOwnerWith(preds ...predicate.PasswordToken) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := newOwnerStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasMissions applies the HasEdge predicate on the "missions" edge.
-func HasMissions() predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, MissionsTable, MissionsColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasMissionsWith applies the HasEdge predicate on the "missions" edge with a given conditions (other predicates).
-func HasMissionsWith(preds ...predicate.Mission) predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		step := newMissionsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

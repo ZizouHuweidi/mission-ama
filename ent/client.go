@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/zizouhuweidi/mission-ama/ent/employee"
 	"github.com/zizouhuweidi/mission-ama/ent/mission"
 	"github.com/zizouhuweidi/mission-ama/ent/passwordtoken"
 	"github.com/zizouhuweidi/mission-ama/ent/project"
@@ -25,6 +26,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// Employee is the client for interacting with the Employee builders.
+	Employee *EmployeeClient
 	// Mission is the client for interacting with the Mission builders.
 	Mission *MissionClient
 	// PasswordToken is the client for interacting with the PasswordToken builders.
@@ -46,6 +49,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.Employee = NewEmployeeClient(c.config)
 	c.Mission = NewMissionClient(c.config)
 	c.PasswordToken = NewPasswordTokenClient(c.config)
 	c.Project = NewProjectClient(c.config)
@@ -132,6 +136,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:           ctx,
 		config:        cfg,
+		Employee:      NewEmployeeClient(cfg),
 		Mission:       NewMissionClient(cfg),
 		PasswordToken: NewPasswordTokenClient(cfg),
 		Project:       NewProjectClient(cfg),
@@ -155,6 +160,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	return &Tx{
 		ctx:           ctx,
 		config:        cfg,
+		Employee:      NewEmployeeClient(cfg),
 		Mission:       NewMissionClient(cfg),
 		PasswordToken: NewPasswordTokenClient(cfg),
 		Project:       NewProjectClient(cfg),
@@ -165,7 +171,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Mission.
+//		Employee.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -187,6 +193,7 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
+	c.Employee.Use(hooks...)
 	c.Mission.Use(hooks...)
 	c.PasswordToken.Use(hooks...)
 	c.Project.Use(hooks...)
@@ -196,6 +203,7 @@ func (c *Client) Use(hooks ...Hook) {
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
+	c.Employee.Intercept(interceptors...)
 	c.Mission.Intercept(interceptors...)
 	c.PasswordToken.Intercept(interceptors...)
 	c.Project.Intercept(interceptors...)
@@ -205,6 +213,8 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
+	case *EmployeeMutation:
+		return c.Employee.mutate(ctx, m)
 	case *MissionMutation:
 		return c.Mission.mutate(ctx, m)
 	case *PasswordTokenMutation:
@@ -215,6 +225,188 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.User.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
+// EmployeeClient is a client for the Employee schema.
+type EmployeeClient struct {
+	config
+}
+
+// NewEmployeeClient returns a client for the Employee from the given config.
+func NewEmployeeClient(c config) *EmployeeClient {
+	return &EmployeeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `employee.Hooks(f(g(h())))`.
+func (c *EmployeeClient) Use(hooks ...Hook) {
+	c.hooks.Employee = append(c.hooks.Employee, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `employee.Intercept(f(g(h())))`.
+func (c *EmployeeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Employee = append(c.inters.Employee, interceptors...)
+}
+
+// Create returns a builder for creating a Employee entity.
+func (c *EmployeeClient) Create() *EmployeeCreate {
+	mutation := newEmployeeMutation(c.config, OpCreate)
+	return &EmployeeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Employee entities.
+func (c *EmployeeClient) CreateBulk(builders ...*EmployeeCreate) *EmployeeCreateBulk {
+	return &EmployeeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Employee.
+func (c *EmployeeClient) Update() *EmployeeUpdate {
+	mutation := newEmployeeMutation(c.config, OpUpdate)
+	return &EmployeeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *EmployeeClient) UpdateOne(e *Employee) *EmployeeUpdateOne {
+	mutation := newEmployeeMutation(c.config, OpUpdateOne, withEmployee(e))
+	return &EmployeeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *EmployeeClient) UpdateOneID(id int) *EmployeeUpdateOne {
+	mutation := newEmployeeMutation(c.config, OpUpdateOne, withEmployeeID(id))
+	return &EmployeeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Employee.
+func (c *EmployeeClient) Delete() *EmployeeDelete {
+	mutation := newEmployeeMutation(c.config, OpDelete)
+	return &EmployeeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *EmployeeClient) DeleteOne(e *Employee) *EmployeeDeleteOne {
+	return c.DeleteOneID(e.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *EmployeeClient) DeleteOneID(id int) *EmployeeDeleteOne {
+	builder := c.Delete().Where(employee.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &EmployeeDeleteOne{builder}
+}
+
+// Query returns a query builder for Employee.
+func (c *EmployeeClient) Query() *EmployeeQuery {
+	return &EmployeeQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeEmployee},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Employee entity by its id.
+func (c *EmployeeClient) Get(ctx context.Context, id int) (*Employee, error) {
+	return c.Query().Where(employee.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *EmployeeClient) GetX(ctx context.Context, id int) *Employee {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryMissions queries the missions edge of a Employee.
+func (c *EmployeeClient) QueryMissions(e *Employee) *MissionQuery {
+	query := (&MissionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(employee.Table, employee.FieldID, id),
+			sqlgraph.To(mission.Table, mission.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, employee.MissionsTable, employee.MissionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryProjects queries the projects edge of a Employee.
+func (c *EmployeeClient) QueryProjects(e *Employee) *ProjectQuery {
+	query := (&ProjectClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(employee.Table, employee.FieldID, id),
+			sqlgraph.To(project.Table, project.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, employee.ProjectsTable, employee.ProjectsColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySupervisee queries the supervisee edge of a Employee.
+func (c *EmployeeClient) QuerySupervisee(e *Employee) *EmployeeQuery {
+	query := (&EmployeeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(employee.Table, employee.FieldID, id),
+			sqlgraph.To(employee.Table, employee.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, employee.SuperviseeTable, employee.SuperviseeColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySupervisor queries the supervisor edge of a Employee.
+func (c *EmployeeClient) QuerySupervisor(e *Employee) *EmployeeQuery {
+	query := (&EmployeeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(employee.Table, employee.FieldID, id),
+			sqlgraph.To(employee.Table, employee.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, employee.SupervisorTable, employee.SupervisorColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *EmployeeClient) Hooks() []Hook {
+	return c.hooks.Employee
+}
+
+// Interceptors returns the client interceptors.
+func (c *EmployeeClient) Interceptors() []Interceptor {
+	return c.inters.Employee
+}
+
+func (c *EmployeeClient) mutate(ctx context.Context, m *EmployeeMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&EmployeeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&EmployeeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&EmployeeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&EmployeeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Employee mutation op: %q", m.Op())
 	}
 }
 
@@ -309,6 +501,38 @@ func (c *MissionClient) GetX(ctx context.Context, id int) *Mission {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryEmployee queries the employee edge of a Mission.
+func (c *MissionClient) QueryEmployee(m *Mission) *EmployeeQuery {
+	query := (&EmployeeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(mission.Table, mission.FieldID, id),
+			sqlgraph.To(employee.Table, employee.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, mission.EmployeeTable, mission.EmployeeColumn),
+		)
+		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryProject queries the project edge of a Mission.
+func (c *MissionClient) QueryProject(m *Mission) *ProjectQuery {
+	query := (&ProjectClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(mission.Table, mission.FieldID, id),
+			sqlgraph.To(project.Table, project.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, mission.ProjectTable, mission.ProjectColumn),
+		)
+		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.
@@ -563,6 +787,22 @@ func (c *ProjectClient) GetX(ctx context.Context, id int) *Project {
 	return obj
 }
 
+// QueryMissions queries the missions edge of a Project.
+func (c *ProjectClient) QueryMissions(pr *Project) *MissionQuery {
+	query := (&MissionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(project.Table, project.FieldID, id),
+			sqlgraph.To(mission.Table, mission.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, project.MissionsTable, project.MissionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *ProjectClient) Hooks() []Hook {
 	return c.hooks.Project
@@ -697,22 +937,6 @@ func (c *UserClient) QueryOwner(u *User) *PasswordTokenQuery {
 	return query
 }
 
-// QueryMissions queries the missions edge of a User.
-func (c *UserClient) QueryMissions(u *User) *MissionQuery {
-	query := (&MissionClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(mission.Table, mission.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, user.MissionsTable, user.MissionsColumn),
-		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // Hooks returns the client hooks.
 func (c *UserClient) Hooks() []Hook {
 	hooks := c.hooks.User
@@ -742,9 +966,9 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Mission, PasswordToken, Project, User []ent.Hook
+		Employee, Mission, PasswordToken, Project, User []ent.Hook
 	}
 	inters struct {
-		Mission, PasswordToken, Project, User []ent.Interceptor
+		Employee, Mission, PasswordToken, Project, User []ent.Interceptor
 	}
 )

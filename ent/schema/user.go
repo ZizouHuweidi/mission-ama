@@ -29,13 +29,10 @@ func (User) Fields() []ent.Field {
 		field.String("password").
 			Sensitive().
 			NotEmpty(),
-		field.Int("phone").
-			Optional(),
 		field.Bool("admin").
 			Default(false),
 		field.Bool("verified").
 			Default(false),
-		field.String("department").Optional(),
 		field.Time("created_at").
 			Default(time.Now).
 			Immutable(),
@@ -47,11 +44,6 @@ func (User) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("owner", PasswordToken.Type).
 			Ref("user"),
-		edge.To("missions", Mission.Type),
-		edge.To("projects", Project.Type),
-		edge.To("supervisor", User.Type).
-			From("supervisee").
-			Unique(),
 	}
 }
 

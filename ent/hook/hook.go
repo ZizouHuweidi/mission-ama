@@ -9,6 +9,18 @@ import (
 	"github.com/zizouhuweidi/mission-ama/ent"
 )
 
+// The EmployeeFunc type is an adapter to allow the use of ordinary
+// function as Employee mutator.
+type EmployeeFunc func(context.Context, *ent.EmployeeMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f EmployeeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.EmployeeMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EmployeeMutation", m)
+}
+
 // The MissionFunc type is an adapter to allow the use of ordinary
 // function as Mission mutator.
 type MissionFunc func(context.Context, *ent.MissionMutation) (ent.Value, error)

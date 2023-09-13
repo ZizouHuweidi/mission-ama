@@ -4,10 +4,13 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/zizouhuweidi/mission-ama/ent/mission"
 	"github.com/zizouhuweidi/mission-ama/ent/project"
 )
 
@@ -18,6 +21,55 @@ type ProjectCreate struct {
 	hooks    []Hook
 }
 
+// SetName sets the "name" field.
+func (pc *ProjectCreate) SetName(s string) *ProjectCreate {
+	pc.mutation.SetName(s)
+	return pc
+}
+
+// SetDescription sets the "description" field.
+func (pc *ProjectCreate) SetDescription(s string) *ProjectCreate {
+	pc.mutation.SetDescription(s)
+	return pc
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (pc *ProjectCreate) SetNillableDescription(s *string) *ProjectCreate {
+	if s != nil {
+		pc.SetDescription(*s)
+	}
+	return pc
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (pc *ProjectCreate) SetCreatedAt(t time.Time) *ProjectCreate {
+	pc.mutation.SetCreatedAt(t)
+	return pc
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (pc *ProjectCreate) SetNillableCreatedAt(t *time.Time) *ProjectCreate {
+	if t != nil {
+		pc.SetCreatedAt(*t)
+	}
+	return pc
+}
+
+// AddMissionIDs adds the "missions" edge to the Mission entity by IDs.
+func (pc *ProjectCreate) AddMissionIDs(ids ...int) *ProjectCreate {
+	pc.mutation.AddMissionIDs(ids...)
+	return pc
+}
+
+// AddMissions adds the "missions" edges to the Mission entity.
+func (pc *ProjectCreate) AddMissions(m ...*Mission) *ProjectCreate {
+	ids := make([]int, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return pc.AddMissionIDs(ids...)
+}
+
 // Mutation returns the ProjectMutation object of the builder.
 func (pc *ProjectCreate) Mutation() *ProjectMutation {
 	return pc.mutation
@@ -25,6 +77,7 @@ func (pc *ProjectCreate) Mutation() *ProjectMutation {
 
 // Save creates the Project in the database.
 func (pc *ProjectCreate) Save(ctx context.Context) (*Project, error) {
+	pc.defaults()
 	return withHooks(ctx, pc.sqlSave, pc.mutation, pc.hooks)
 }
 
@@ -50,8 +103,32 @@ func (pc *ProjectCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (pc *ProjectCreate) defaults() {
+	if _, ok := pc.mutation.CreatedAt(); !ok {
+		v := project.DefaultCreatedAt()
+		pc.mutation.SetCreatedAt(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (pc *ProjectCreate) check() error {
+	if _, ok := pc.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Project.name"`)}
+	}
+	if v, ok := pc.mutation.Name(); ok {
+		if err := project.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Project.name": %w`, err)}
+		}
+	}
+	if v, ok := pc.mutation.Description(); ok {
+		if err := project.DescriptionValidator(v); err != nil {
+			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Project.description": %w`, err)}
+		}
+	}
+	if _, ok := pc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Project.created_at"`)}
+	}
 	return nil
 }
 
@@ -78,6 +155,34 @@ func (pc *ProjectCreate) createSpec() (*Project, *sqlgraph.CreateSpec) {
 		_node = &Project{config: pc.config}
 		_spec = sqlgraph.NewCreateSpec(project.Table, sqlgraph.NewFieldSpec(project.FieldID, field.TypeInt))
 	)
+	if value, ok := pc.mutation.Name(); ok {
+		_spec.SetField(project.FieldName, field.TypeString, value)
+		_node.Name = value
+	}
+	if value, ok := pc.mutation.Description(); ok {
+		_spec.SetField(project.FieldDescription, field.TypeString, value)
+		_node.Description = value
+	}
+	if value, ok := pc.mutation.CreatedAt(); ok {
+		_spec.SetField(project.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
+	}
+	if nodes := pc.mutation.MissionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   project.MissionsTable,
+			Columns: []string{project.MissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	return _node, _spec
 }
 
@@ -95,6 +200,7 @@ func (pcb *ProjectCreateBulk) Save(ctx context.Context) ([]*Project, error) {
 	for i := range pcb.builders {
 		func(i int, root context.Context) {
 			builder := pcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*ProjectMutation)
 				if !ok {

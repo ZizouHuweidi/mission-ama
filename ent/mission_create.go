@@ -4,11 +4,15 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/zizouhuweidi/mission-ama/ent/employee"
 	"github.com/zizouhuweidi/mission-ama/ent/mission"
+	"github.com/zizouhuweidi/mission-ama/ent/project"
 )
 
 // MissionCreate is the builder for creating a Mission entity.
@@ -18,6 +22,118 @@ type MissionCreate struct {
 	hooks    []Hook
 }
 
+// SetName sets the "name" field.
+func (mc *MissionCreate) SetName(s string) *MissionCreate {
+	mc.mutation.SetName(s)
+	return mc
+}
+
+// SetPurpose sets the "purpose" field.
+func (mc *MissionCreate) SetPurpose(s string) *MissionCreate {
+	mc.mutation.SetPurpose(s)
+	return mc
+}
+
+// SetNillablePurpose sets the "purpose" field if the given value is not nil.
+func (mc *MissionCreate) SetNillablePurpose(s *string) *MissionCreate {
+	if s != nil {
+		mc.SetPurpose(*s)
+	}
+	return mc
+}
+
+// SetDestination sets the "destination" field.
+func (mc *MissionCreate) SetDestination(s string) *MissionCreate {
+	mc.mutation.SetDestination(s)
+	return mc
+}
+
+// SetStartDate sets the "startDate" field.
+func (mc *MissionCreate) SetStartDate(t time.Time) *MissionCreate {
+	mc.mutation.SetStartDate(t)
+	return mc
+}
+
+// SetNillableStartDate sets the "startDate" field if the given value is not nil.
+func (mc *MissionCreate) SetNillableStartDate(t *time.Time) *MissionCreate {
+	if t != nil {
+		mc.SetStartDate(*t)
+	}
+	return mc
+}
+
+// SetEndDate sets the "endDate" field.
+func (mc *MissionCreate) SetEndDate(t time.Time) *MissionCreate {
+	mc.mutation.SetEndDate(t)
+	return mc
+}
+
+// SetNillableEndDate sets the "endDate" field if the given value is not nil.
+func (mc *MissionCreate) SetNillableEndDate(t *time.Time) *MissionCreate {
+	if t != nil {
+		mc.SetEndDate(*t)
+	}
+	return mc
+}
+
+// SetTransport sets the "transport" field.
+func (mc *MissionCreate) SetTransport(s string) *MissionCreate {
+	mc.mutation.SetTransport(s)
+	return mc
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (mc *MissionCreate) SetCreatedAt(t time.Time) *MissionCreate {
+	mc.mutation.SetCreatedAt(t)
+	return mc
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (mc *MissionCreate) SetNillableCreatedAt(t *time.Time) *MissionCreate {
+	if t != nil {
+		mc.SetCreatedAt(*t)
+	}
+	return mc
+}
+
+// SetEmployeeID sets the "employee" edge to the Employee entity by ID.
+func (mc *MissionCreate) SetEmployeeID(id int) *MissionCreate {
+	mc.mutation.SetEmployeeID(id)
+	return mc
+}
+
+// SetNillableEmployeeID sets the "employee" edge to the Employee entity by ID if the given value is not nil.
+func (mc *MissionCreate) SetNillableEmployeeID(id *int) *MissionCreate {
+	if id != nil {
+		mc = mc.SetEmployeeID(*id)
+	}
+	return mc
+}
+
+// SetEmployee sets the "employee" edge to the Employee entity.
+func (mc *MissionCreate) SetEmployee(e *Employee) *MissionCreate {
+	return mc.SetEmployeeID(e.ID)
+}
+
+// SetProjectID sets the "project" edge to the Project entity by ID.
+func (mc *MissionCreate) SetProjectID(id int) *MissionCreate {
+	mc.mutation.SetProjectID(id)
+	return mc
+}
+
+// SetNillableProjectID sets the "project" edge to the Project entity by ID if the given value is not nil.
+func (mc *MissionCreate) SetNillableProjectID(id *int) *MissionCreate {
+	if id != nil {
+		mc = mc.SetProjectID(*id)
+	}
+	return mc
+}
+
+// SetProject sets the "project" edge to the Project entity.
+func (mc *MissionCreate) SetProject(p *Project) *MissionCreate {
+	return mc.SetProjectID(p.ID)
+}
+
 // Mutation returns the MissionMutation object of the builder.
 func (mc *MissionCreate) Mutation() *MissionMutation {
 	return mc.mutation
@@ -25,6 +141,7 @@ func (mc *MissionCreate) Mutation() *MissionMutation {
 
 // Save creates the Mission in the database.
 func (mc *MissionCreate) Save(ctx context.Context) (*Mission, error) {
+	mc.defaults()
 	return withHooks(ctx, mc.sqlSave, mc.mutation, mc.hooks)
 }
 
@@ -50,8 +167,38 @@ func (mc *MissionCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (mc *MissionCreate) defaults() {
+	if _, ok := mc.mutation.CreatedAt(); !ok {
+		v := mission.DefaultCreatedAt()
+		mc.mutation.SetCreatedAt(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (mc *MissionCreate) check() error {
+	if _, ok := mc.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Mission.name"`)}
+	}
+	if v, ok := mc.mutation.Name(); ok {
+		if err := mission.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Mission.name": %w`, err)}
+		}
+	}
+	if _, ok := mc.mutation.Destination(); !ok {
+		return &ValidationError{Name: "destination", err: errors.New(`ent: missing required field "Mission.destination"`)}
+	}
+	if v, ok := mc.mutation.Destination(); ok {
+		if err := mission.DestinationValidator(v); err != nil {
+			return &ValidationError{Name: "destination", err: fmt.Errorf(`ent: validator failed for field "Mission.destination": %w`, err)}
+		}
+	}
+	if _, ok := mc.mutation.Transport(); !ok {
+		return &ValidationError{Name: "transport", err: errors.New(`ent: missing required field "Mission.transport"`)}
+	}
+	if _, ok := mc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Mission.created_at"`)}
+	}
 	return nil
 }
 
@@ -78,6 +225,68 @@ func (mc *MissionCreate) createSpec() (*Mission, *sqlgraph.CreateSpec) {
 		_node = &Mission{config: mc.config}
 		_spec = sqlgraph.NewCreateSpec(mission.Table, sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt))
 	)
+	if value, ok := mc.mutation.Name(); ok {
+		_spec.SetField(mission.FieldName, field.TypeString, value)
+		_node.Name = value
+	}
+	if value, ok := mc.mutation.Purpose(); ok {
+		_spec.SetField(mission.FieldPurpose, field.TypeString, value)
+		_node.Purpose = value
+	}
+	if value, ok := mc.mutation.Destination(); ok {
+		_spec.SetField(mission.FieldDestination, field.TypeString, value)
+		_node.Destination = value
+	}
+	if value, ok := mc.mutation.StartDate(); ok {
+		_spec.SetField(mission.FieldStartDate, field.TypeTime, value)
+		_node.StartDate = value
+	}
+	if value, ok := mc.mutation.EndDate(); ok {
+		_spec.SetField(mission.FieldEndDate, field.TypeTime, value)
+		_node.EndDate = value
+	}
+	if value, ok := mc.mutation.Transport(); ok {
+		_spec.SetField(mission.FieldTransport, field.TypeString, value)
+		_node.Transport = value
+	}
+	if value, ok := mc.mutation.CreatedAt(); ok {
+		_spec.SetField(mission.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
+	}
+	if nodes := mc.mutation.EmployeeIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   mission.EmployeeTable,
+			Columns: []string{mission.EmployeeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.employee_missions = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := mc.mutation.ProjectIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   mission.ProjectTable,
+			Columns: []string{mission.ProjectColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(project.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.project_missions = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	return _node, _spec
 }
 
@@ -95,6 +304,7 @@ func (mcb *MissionCreateBulk) Save(ctx context.Context) ([]*Mission, error) {
 	for i := range mcb.builders {
 		func(i int, root context.Context) {
 			builder := mcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*MissionMutation)
 				if !ok {

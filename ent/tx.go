@@ -12,6 +12,8 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// Employee is the client for interacting with the Employee builders.
+	Employee *EmployeeClient
 	// Mission is the client for interacting with the Mission builders.
 	Mission *MissionClient
 	// PasswordToken is the client for interacting with the PasswordToken builders.
@@ -151,6 +153,7 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.Employee = NewEmployeeClient(tx.config)
 	tx.Mission = NewMissionClient(tx.config)
 	tx.PasswordToken = NewPasswordTokenClient(tx.config)
 	tx.Project = NewProjectClient(tx.config)
@@ -164,7 +167,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: Mission.QueryXXX(), the query will be executed
+// applies a query, for example: Employee.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

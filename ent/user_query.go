@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/zizouhuweidi/mission-ama/ent/mission"
 	"github.com/zizouhuweidi/mission-ama/ent/passwordtoken"
 	"github.com/zizouhuweidi/mission-ama/ent/predicate"
 	"github.com/zizouhuweidi/mission-ama/ent/user"
@@ -20,12 +19,11 @@ import (
 // UserQuery is the builder for querying User entities.
 type UserQuery struct {
 	config
-	ctx          *QueryContext
-	order        []user.OrderOption
-	inters       []Interceptor
-	predicates   []predicate.User
-	withOwner    *PasswordTokenQuery
-	withMissions *MissionQuery
+	ctx        *QueryContext
+	order      []user.OrderOption
+	inters     []Interceptor
+	predicates []predicate.User
+	withOwner  *PasswordTokenQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -77,28 +75,6 @@ func (uq *UserQuery) QueryOwner() *PasswordTokenQuery {
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(passwordtoken.Table, passwordtoken.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, user.OwnerTable, user.OwnerColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryMissions chains the current query on the "missions" edge.
-func (uq *UserQuery) QueryMissions() *MissionQuery {
-	query := (&MissionClient{config: uq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := uq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := uq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, selector),
-			sqlgraph.To(mission.Table, mission.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, user.MissionsTable, user.MissionsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -293,13 +269,12 @@ func (uq *UserQuery) Clone() *UserQuery {
 		return nil
 	}
 	return &UserQuery{
-		config:       uq.config,
-		ctx:          uq.ctx.Clone(),
-		order:        append([]user.OrderOption{}, uq.order...),
-		inters:       append([]Interceptor{}, uq.inters...),
-		predicates:   append([]predicate.User{}, uq.predicates...),
-		withOwner:    uq.withOwner.Clone(),
-		withMissions: uq.withMissions.Clone(),
+		config:     uq.config,
+		ctx:        uq.ctx.Clone(),
+		order:      append([]user.OrderOption{}, uq.order...),
+		inters:     append([]Interceptor{}, uq.inters...),
+		predicates: append([]predicate.User{}, uq.predicates...),
+		withOwner:  uq.withOwner.Clone(),
 		// clone intermediate query.
 		sql:  uq.sql.Clone(),
 		path: uq.path,
@@ -314,17 +289,6 @@ func (uq *UserQuery) WithOwner(opts ...func(*PasswordTokenQuery)) *UserQuery {
 		opt(query)
 	}
 	uq.withOwner = query
-	return uq
-}
-
-// WithMissions tells the query-builder to eager-load the nodes that are connected to
-// the "missions" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithMissions(opts ...func(*MissionQuery)) *UserQuery {
-	query := (&MissionClient{config: uq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	uq.withMissions = query
 	return uq
 }
 
@@ -406,9 +370,8 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	var (
 		nodes       = []*User{}
 		_spec       = uq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [1]bool{
 			uq.withOwner != nil,
-			uq.withMissions != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -433,13 +396,6 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		if err := uq.loadOwner(ctx, query, nodes,
 			func(n *User) { n.Edges.Owner = []*PasswordToken{} },
 			func(n *User, e *PasswordToken) { n.Edges.Owner = append(n.Edges.Owner, e) }); err != nil {
-			return nil, err
-		}
-	}
-	if query := uq.withMissions; query != nil {
-		if err := uq.loadMissions(ctx, query, nodes,
-			func(n *User) { n.Edges.Missions = []*Mission{} },
-			func(n *User, e *Mission) { n.Edges.Missions = append(n.Edges.Missions, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -472,37 +428,6 @@ func (uq *UserQuery) loadOwner(ctx context.Context, query *PasswordTokenQuery, n
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "password_token_user" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
-}
-func (uq *UserQuery) loadMissions(ctx context.Context, query *MissionQuery, nodes []*User, init func(*User), assign func(*User, *Mission)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*User)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	query.withFKs = true
-	query.Where(predicate.Mission(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(user.MissionsColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.user_missions
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "user_missions" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "user_missions" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

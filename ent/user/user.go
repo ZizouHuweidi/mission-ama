@@ -21,20 +21,14 @@ const (
 	FieldEmail = "email"
 	// FieldPassword holds the string denoting the password field in the database.
 	FieldPassword = "password"
-	// FieldPhone holds the string denoting the phone field in the database.
-	FieldPhone = "phone"
 	// FieldAdmin holds the string denoting the admin field in the database.
 	FieldAdmin = "admin"
 	// FieldVerified holds the string denoting the verified field in the database.
 	FieldVerified = "verified"
-	// FieldDepartment holds the string denoting the department field in the database.
-	FieldDepartment = "department"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// EdgeOwner holds the string denoting the owner edge name in mutations.
 	EdgeOwner = "owner"
-	// EdgeMissions holds the string denoting the missions edge name in mutations.
-	EdgeMissions = "missions"
 	// Table holds the table name of the user in the database.
 	Table = "users"
 	// OwnerTable is the table that holds the owner relation/edge.
@@ -44,13 +38,6 @@ const (
 	OwnerInverseTable = "password_tokens"
 	// OwnerColumn is the table column denoting the owner relation/edge.
 	OwnerColumn = "password_token_user"
-	// MissionsTable is the table that holds the missions relation/edge.
-	MissionsTable = "missions"
-	// MissionsInverseTable is the table name for the Mission entity.
-	// It exists in this package in order to avoid circular dependency with the "mission" package.
-	MissionsInverseTable = "missions"
-	// MissionsColumn is the table column denoting the missions relation/edge.
-	MissionsColumn = "user_missions"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -59,10 +46,8 @@ var Columns = []string{
 	FieldName,
 	FieldEmail,
 	FieldPassword,
-	FieldPhone,
 	FieldAdmin,
 	FieldVerified,
-	FieldDepartment,
 	FieldCreatedAt,
 }
 
@@ -120,11 +105,6 @@ func ByPassword(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPassword, opts...).ToFunc()
 }
 
-// ByPhone orders the results by the phone field.
-func ByPhone(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldPhone, opts...).ToFunc()
-}
-
 // ByAdmin orders the results by the admin field.
 func ByAdmin(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAdmin, opts...).ToFunc()
@@ -133,11 +113,6 @@ func ByAdmin(opts ...sql.OrderTermOption) OrderOption {
 // ByVerified orders the results by the verified field.
 func ByVerified(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldVerified, opts...).ToFunc()
-}
-
-// ByDepartment orders the results by the department field.
-func ByDepartment(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDepartment, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.
@@ -158,31 +133,10 @@ func ByOwner(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newOwnerStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-
-// ByMissionsCount orders the results by missions count.
-func ByMissionsCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newMissionsStep(), opts...)
-	}
-}
-
-// ByMissions orders the results by missions terms.
-func ByMissions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newMissionsStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
 func newOwnerStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(OwnerInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, true, OwnerTable, OwnerColumn),
-	)
-}
-func newMissionsStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(MissionsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, MissionsTable, MissionsColumn),
 	)
 }

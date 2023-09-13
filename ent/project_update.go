@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/zizouhuweidi/mission-ama/ent/mission"
 	"github.com/zizouhuweidi/mission-ama/ent/predicate"
 	"github.com/zizouhuweidi/mission-ama/ent/project"
 )
@@ -27,9 +28,71 @@ func (pu *ProjectUpdate) Where(ps ...predicate.Project) *ProjectUpdate {
 	return pu
 }
 
+// SetName sets the "name" field.
+func (pu *ProjectUpdate) SetName(s string) *ProjectUpdate {
+	pu.mutation.SetName(s)
+	return pu
+}
+
+// SetDescription sets the "description" field.
+func (pu *ProjectUpdate) SetDescription(s string) *ProjectUpdate {
+	pu.mutation.SetDescription(s)
+	return pu
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (pu *ProjectUpdate) SetNillableDescription(s *string) *ProjectUpdate {
+	if s != nil {
+		pu.SetDescription(*s)
+	}
+	return pu
+}
+
+// ClearDescription clears the value of the "description" field.
+func (pu *ProjectUpdate) ClearDescription() *ProjectUpdate {
+	pu.mutation.ClearDescription()
+	return pu
+}
+
+// AddMissionIDs adds the "missions" edge to the Mission entity by IDs.
+func (pu *ProjectUpdate) AddMissionIDs(ids ...int) *ProjectUpdate {
+	pu.mutation.AddMissionIDs(ids...)
+	return pu
+}
+
+// AddMissions adds the "missions" edges to the Mission entity.
+func (pu *ProjectUpdate) AddMissions(m ...*Mission) *ProjectUpdate {
+	ids := make([]int, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return pu.AddMissionIDs(ids...)
+}
+
 // Mutation returns the ProjectMutation object of the builder.
 func (pu *ProjectUpdate) Mutation() *ProjectMutation {
 	return pu.mutation
+}
+
+// ClearMissions clears all "missions" edges to the Mission entity.
+func (pu *ProjectUpdate) ClearMissions() *ProjectUpdate {
+	pu.mutation.ClearMissions()
+	return pu
+}
+
+// RemoveMissionIDs removes the "missions" edge to Mission entities by IDs.
+func (pu *ProjectUpdate) RemoveMissionIDs(ids ...int) *ProjectUpdate {
+	pu.mutation.RemoveMissionIDs(ids...)
+	return pu
+}
+
+// RemoveMissions removes "missions" edges to Mission entities.
+func (pu *ProjectUpdate) RemoveMissions(m ...*Mission) *ProjectUpdate {
+	ids := make([]int, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return pu.RemoveMissionIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -59,7 +122,25 @@ func (pu *ProjectUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (pu *ProjectUpdate) check() error {
+	if v, ok := pu.mutation.Name(); ok {
+		if err := project.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Project.name": %w`, err)}
+		}
+	}
+	if v, ok := pu.mutation.Description(); ok {
+		if err := project.DescriptionValidator(v); err != nil {
+			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Project.description": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (pu *ProjectUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := pu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(project.Table, project.Columns, sqlgraph.NewFieldSpec(project.FieldID, field.TypeInt))
 	if ps := pu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -67,6 +148,60 @@ func (pu *ProjectUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := pu.mutation.Name(); ok {
+		_spec.SetField(project.FieldName, field.TypeString, value)
+	}
+	if value, ok := pu.mutation.Description(); ok {
+		_spec.SetField(project.FieldDescription, field.TypeString, value)
+	}
+	if pu.mutation.DescriptionCleared() {
+		_spec.ClearField(project.FieldDescription, field.TypeString)
+	}
+	if pu.mutation.MissionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   project.MissionsTable,
+			Columns: []string{project.MissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.RemovedMissionsIDs(); len(nodes) > 0 && !pu.mutation.MissionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   project.MissionsTable,
+			Columns: []string{project.MissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.MissionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   project.MissionsTable,
+			Columns: []string{project.MissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, pu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -88,9 +223,71 @@ type ProjectUpdateOne struct {
 	mutation *ProjectMutation
 }
 
+// SetName sets the "name" field.
+func (puo *ProjectUpdateOne) SetName(s string) *ProjectUpdateOne {
+	puo.mutation.SetName(s)
+	return puo
+}
+
+// SetDescription sets the "description" field.
+func (puo *ProjectUpdateOne) SetDescription(s string) *ProjectUpdateOne {
+	puo.mutation.SetDescription(s)
+	return puo
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (puo *ProjectUpdateOne) SetNillableDescription(s *string) *ProjectUpdateOne {
+	if s != nil {
+		puo.SetDescription(*s)
+	}
+	return puo
+}
+
+// ClearDescription clears the value of the "description" field.
+func (puo *ProjectUpdateOne) ClearDescription() *ProjectUpdateOne {
+	puo.mutation.ClearDescription()
+	return puo
+}
+
+// AddMissionIDs adds the "missions" edge to the Mission entity by IDs.
+func (puo *ProjectUpdateOne) AddMissionIDs(ids ...int) *ProjectUpdateOne {
+	puo.mutation.AddMissionIDs(ids...)
+	return puo
+}
+
+// AddMissions adds the "missions" edges to the Mission entity.
+func (puo *ProjectUpdateOne) AddMissions(m ...*Mission) *ProjectUpdateOne {
+	ids := make([]int, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return puo.AddMissionIDs(ids...)
+}
+
 // Mutation returns the ProjectMutation object of the builder.
 func (puo *ProjectUpdateOne) Mutation() *ProjectMutation {
 	return puo.mutation
+}
+
+// ClearMissions clears all "missions" edges to the Mission entity.
+func (puo *ProjectUpdateOne) ClearMissions() *ProjectUpdateOne {
+	puo.mutation.ClearMissions()
+	return puo
+}
+
+// RemoveMissionIDs removes the "missions" edge to Mission entities by IDs.
+func (puo *ProjectUpdateOne) RemoveMissionIDs(ids ...int) *ProjectUpdateOne {
+	puo.mutation.RemoveMissionIDs(ids...)
+	return puo
+}
+
+// RemoveMissions removes "missions" edges to Mission entities.
+func (puo *ProjectUpdateOne) RemoveMissions(m ...*Mission) *ProjectUpdateOne {
+	ids := make([]int, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return puo.RemoveMissionIDs(ids...)
 }
 
 // Where appends a list predicates to the ProjectUpdate builder.
@@ -133,7 +330,25 @@ func (puo *ProjectUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (puo *ProjectUpdateOne) check() error {
+	if v, ok := puo.mutation.Name(); ok {
+		if err := project.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Project.name": %w`, err)}
+		}
+	}
+	if v, ok := puo.mutation.Description(); ok {
+		if err := project.DescriptionValidator(v); err != nil {
+			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Project.description": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (puo *ProjectUpdateOne) sqlSave(ctx context.Context) (_node *Project, err error) {
+	if err := puo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(project.Table, project.Columns, sqlgraph.NewFieldSpec(project.FieldID, field.TypeInt))
 	id, ok := puo.mutation.ID()
 	if !ok {
@@ -158,6 +373,60 @@ func (puo *ProjectUpdateOne) sqlSave(ctx context.Context) (_node *Project, err e
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := puo.mutation.Name(); ok {
+		_spec.SetField(project.FieldName, field.TypeString, value)
+	}
+	if value, ok := puo.mutation.Description(); ok {
+		_spec.SetField(project.FieldDescription, field.TypeString, value)
+	}
+	if puo.mutation.DescriptionCleared() {
+		_spec.ClearField(project.FieldDescription, field.TypeString)
+	}
+	if puo.mutation.MissionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   project.MissionsTable,
+			Columns: []string{project.MissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.RemovedMissionsIDs(); len(nodes) > 0 && !puo.mutation.MissionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   project.MissionsTable,
+			Columns: []string{project.MissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.MissionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   project.MissionsTable,
+			Columns: []string{project.MissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Project{config: puo.config}
 	_spec.Assign = _node.assignValues

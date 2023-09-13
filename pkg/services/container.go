@@ -8,16 +8,12 @@ import (
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/schema"
-
-	// Required by ent
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 
 	"github.com/zizouhuweidi/mission-ama/config"
 	"github.com/zizouhuweidi/mission-ama/ent"
-
-	// Require by ent
 	_ "github.com/zizouhuweidi/mission-ama/ent/runtime"
 )
 
@@ -50,9 +46,6 @@ type Container struct {
 
 	// TemplateRenderer stores a service to easily render and cache templates
 	TemplateRenderer *TemplateRenderer
-
-	// Tasks stores the task client
-	Tasks *TaskClient
 }
 
 // NewContainer creates and initializes a new Container
@@ -67,15 +60,11 @@ func NewContainer() *Container {
 	c.initAuth()
 	c.initTemplateRenderer()
 	c.initMail()
-	c.initTasks()
 	return c
 }
 
 // Shutdown shuts the Container down and disconnects all connections
 func (c *Container) Shutdown() error {
-	if err := c.Tasks.Close(); err != nil {
-		return err
-	}
 	if err := c.Cache.Close(); err != nil {
 		return err
 	}
@@ -193,9 +182,4 @@ func (c *Container) initMail() {
 	if err != nil {
 		panic(fmt.Sprintf("failed to create mail client: %v", err))
 	}
-}
-
-// initTasks initializes the task client
-func (c *Container) initTasks() {
-	c.Tasks = NewTaskClient(c.Config)
 }

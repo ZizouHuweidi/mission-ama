@@ -8,10 +8,42 @@ import (
 )
 
 var (
+	// EmployeesColumns holds the columns for the "employees" table.
+	EmployeesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "phone", Type: field.TypeInt},
+		{Name: "csp", Type: field.TypeBool, Default: false},
+		{Name: "occupation", Type: field.TypeString, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "employee_supervisor", Type: field.TypeInt, Nullable: true},
+	}
+	// EmployeesTable holds the schema information for the "employees" table.
+	EmployeesTable = &schema.Table{
+		Name:       "employees",
+		Columns:    EmployeesColumns,
+		PrimaryKey: []*schema.Column{EmployeesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "employees_employees_supervisor",
+				Columns:    []*schema.Column{EmployeesColumns[6]},
+				RefColumns: []*schema.Column{EmployeesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// MissionsColumns holds the columns for the "missions" table.
 	MissionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "user_missions", Type: field.TypeInt, Nullable: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "purpose", Type: field.TypeString, Nullable: true},
+		{Name: "destination", Type: field.TypeString},
+		{Name: "start_date", Type: field.TypeTime, Nullable: true},
+		{Name: "end_date", Type: field.TypeTime, Nullable: true},
+		{Name: "transport", Type: field.TypeString},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "employee_missions", Type: field.TypeInt, Nullable: true},
+		{Name: "project_missions", Type: field.TypeInt, Nullable: true},
 	}
 	// MissionsTable holds the schema information for the "missions" table.
 	MissionsTable = &schema.Table{
@@ -20,9 +52,15 @@ var (
 		PrimaryKey: []*schema.Column{MissionsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "missions_users_missions",
-				Columns:    []*schema.Column{MissionsColumns[1]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
+				Symbol:     "missions_employees_missions",
+				Columns:    []*schema.Column{MissionsColumns[8]},
+				RefColumns: []*schema.Column{EmployeesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "missions_projects_missions",
+				Columns:    []*schema.Column{MissionsColumns[9]},
+				RefColumns: []*schema.Column{ProjectsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -51,12 +89,24 @@ var (
 	// ProjectsColumns holds the columns for the "projects" table.
 	ProjectsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "employee_projects", Type: field.TypeInt, Nullable: true},
 	}
 	// ProjectsTable holds the schema information for the "projects" table.
 	ProjectsTable = &schema.Table{
 		Name:       "projects",
 		Columns:    ProjectsColumns,
 		PrimaryKey: []*schema.Column{ProjectsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "projects_employees_projects",
+				Columns:    []*schema.Column{ProjectsColumns[4]},
+				RefColumns: []*schema.Column{EmployeesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
@@ -64,10 +114,8 @@ var (
 		{Name: "name", Type: field.TypeString},
 		{Name: "email", Type: field.TypeString, Unique: true},
 		{Name: "password", Type: field.TypeString},
-		{Name: "phone", Type: field.TypeInt, Nullable: true},
 		{Name: "admin", Type: field.TypeBool, Default: false},
 		{Name: "verified", Type: field.TypeBool, Default: false},
-		{Name: "department", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 	}
 	// UsersTable holds the schema information for the "users" table.
@@ -78,6 +126,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		EmployeesTable,
 		MissionsTable,
 		PasswordTokensTable,
 		ProjectsTable,
@@ -86,6 +135,9 @@ var (
 )
 
 func init() {
-	MissionsTable.ForeignKeys[0].RefTable = UsersTable
+	EmployeesTable.ForeignKeys[0].RefTable = EmployeesTable
+	MissionsTable.ForeignKeys[0].RefTable = EmployeesTable
+	MissionsTable.ForeignKeys[1].RefTable = ProjectsTable
 	PasswordTokensTable.ForeignKeys[0].RefTable = UsersTable
+	ProjectsTable.ForeignKeys[0].RefTable = EmployeesTable
 }

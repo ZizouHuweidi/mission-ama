@@ -10,18 +10,22 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/zizouhuweidi/mission-ama/ent/employee"
 	"github.com/zizouhuweidi/mission-ama/ent/mission"
 	"github.com/zizouhuweidi/mission-ama/ent/predicate"
+	"github.com/zizouhuweidi/mission-ama/ent/project"
 )
 
 // MissionQuery is the builder for querying Mission entities.
 type MissionQuery struct {
 	config
-	ctx        *QueryContext
-	order      []mission.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Mission
-	withFKs    bool
+	ctx          *QueryContext
+	order        []mission.OrderOption
+	inters       []Interceptor
+	predicates   []predicate.Mission
+	withEmployee *EmployeeQuery
+	withProject  *ProjectQuery
+	withFKs      bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -56,6 +60,50 @@ func (mq *MissionQuery) Unique(unique bool) *MissionQuery {
 func (mq *MissionQuery) Order(o ...mission.OrderOption) *MissionQuery {
 	mq.order = append(mq.order, o...)
 	return mq
+}
+
+// QueryEmployee chains the current query on the "employee" edge.
+func (mq *MissionQuery) QueryEmployee() *EmployeeQuery {
+	query := (&EmployeeClient{config: mq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := mq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := mq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(mission.Table, mission.FieldID, selector),
+			sqlgraph.To(employee.Table, employee.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, mission.EmployeeTable, mission.EmployeeColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryProject chains the current query on the "project" edge.
+func (mq *MissionQuery) QueryProject() *ProjectQuery {
+	query := (&ProjectClient{config: mq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := mq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := mq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(mission.Table, mission.FieldID, selector),
+			sqlgraph.To(project.Table, project.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, mission.ProjectTable, mission.ProjectColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Mission entity from the query.
@@ -245,19 +293,55 @@ func (mq *MissionQuery) Clone() *MissionQuery {
 		return nil
 	}
 	return &MissionQuery{
-		config:     mq.config,
-		ctx:        mq.ctx.Clone(),
-		order:      append([]mission.OrderOption{}, mq.order...),
-		inters:     append([]Interceptor{}, mq.inters...),
-		predicates: append([]predicate.Mission{}, mq.predicates...),
+		config:       mq.config,
+		ctx:          mq.ctx.Clone(),
+		order:        append([]mission.OrderOption{}, mq.order...),
+		inters:       append([]Interceptor{}, mq.inters...),
+		predicates:   append([]predicate.Mission{}, mq.predicates...),
+		withEmployee: mq.withEmployee.Clone(),
+		withProject:  mq.withProject.Clone(),
 		// clone intermediate query.
 		sql:  mq.sql.Clone(),
 		path: mq.path,
 	}
 }
 
+// WithEmployee tells the query-builder to eager-load the nodes that are connected to
+// the "employee" edge. The optional arguments are used to configure the query builder of the edge.
+func (mq *MissionQuery) WithEmployee(opts ...func(*EmployeeQuery)) *MissionQuery {
+	query := (&EmployeeClient{config: mq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	mq.withEmployee = query
+	return mq
+}
+
+// WithProject tells the query-builder to eager-load the nodes that are connected to
+// the "project" edge. The optional arguments are used to configure the query builder of the edge.
+func (mq *MissionQuery) WithProject(opts ...func(*ProjectQuery)) *MissionQuery {
+	query := (&ProjectClient{config: mq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	mq.withProject = query
+	return mq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
+//
+// Example:
+//
+//	var v []struct {
+//		Name string `json:"name,omitempty"`
+//		Count int `json:"count,omitempty"`
+//	}
+//
+//	client.Mission.Query().
+//		GroupBy(mission.FieldName).
+//		Aggregate(ent.Count()).
+//		Scan(ctx, &v)
 func (mq *MissionQuery) GroupBy(field string, fields ...string) *MissionGroupBy {
 	mq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &MissionGroupBy{build: mq}
@@ -269,6 +353,16 @@ func (mq *MissionQuery) GroupBy(field string, fields ...string) *MissionGroupBy 
 
 // Select allows the selection one or more fields/columns for the given query,
 // instead of selecting all fields in the entity.
+//
+// Example:
+//
+//	var v []struct {
+//		Name string `json:"name,omitempty"`
+//	}
+//
+//	client.Mission.Query().
+//		Select(mission.FieldName).
+//		Scan(ctx, &v)
 func (mq *MissionQuery) Select(fields ...string) *MissionSelect {
 	mq.ctx.Fields = append(mq.ctx.Fields, fields...)
 	sbuild := &MissionSelect{MissionQuery: mq}
@@ -310,10 +404,17 @@ func (mq *MissionQuery) prepareQuery(ctx context.Context) error {
 
 func (mq *MissionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Mission, error) {
 	var (
-		nodes   = []*Mission{}
-		withFKs = mq.withFKs
-		_spec   = mq.querySpec()
+		nodes       = []*Mission{}
+		withFKs     = mq.withFKs
+		_spec       = mq.querySpec()
+		loadedTypes = [2]bool{
+			mq.withEmployee != nil,
+			mq.withProject != nil,
+		}
 	)
+	if mq.withEmployee != nil || mq.withProject != nil {
+		withFKs = true
+	}
 	if withFKs {
 		_spec.Node.Columns = append(_spec.Node.Columns, mission.ForeignKeys...)
 	}
@@ -323,6 +424,7 @@ func (mq *MissionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Miss
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Mission{config: mq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -334,7 +436,84 @@ func (mq *MissionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Miss
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := mq.withEmployee; query != nil {
+		if err := mq.loadEmployee(ctx, query, nodes, nil,
+			func(n *Mission, e *Employee) { n.Edges.Employee = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := mq.withProject; query != nil {
+		if err := mq.loadProject(ctx, query, nodes, nil,
+			func(n *Mission, e *Project) { n.Edges.Project = e }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (mq *MissionQuery) loadEmployee(ctx context.Context, query *EmployeeQuery, nodes []*Mission, init func(*Mission), assign func(*Mission, *Employee)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Mission)
+	for i := range nodes {
+		if nodes[i].employee_missions == nil {
+			continue
+		}
+		fk := *nodes[i].employee_missions
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(employee.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "employee_missions" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (mq *MissionQuery) loadProject(ctx context.Context, query *ProjectQuery, nodes []*Mission, init func(*Mission), assign func(*Mission, *Project)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Mission)
+	for i := range nodes {
+		if nodes[i].project_missions == nil {
+			continue
+		}
+		fk := *nodes[i].project_missions
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(project.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "project_missions" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
 }
 
 func (mq *MissionQuery) sqlCount(ctx context.Context) (int, error) {

@@ -10,7 +10,6 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/zizouhuweidi/mission-ama/ent/mission"
 	"github.com/zizouhuweidi/mission-ama/ent/passwordtoken"
 	"github.com/zizouhuweidi/mission-ama/ent/user"
 )
@@ -37,20 +36,6 @@ func (uc *UserCreate) SetEmail(s string) *UserCreate {
 // SetPassword sets the "password" field.
 func (uc *UserCreate) SetPassword(s string) *UserCreate {
 	uc.mutation.SetPassword(s)
-	return uc
-}
-
-// SetPhone sets the "phone" field.
-func (uc *UserCreate) SetPhone(i int) *UserCreate {
-	uc.mutation.SetPhone(i)
-	return uc
-}
-
-// SetNillablePhone sets the "phone" field if the given value is not nil.
-func (uc *UserCreate) SetNillablePhone(i *int) *UserCreate {
-	if i != nil {
-		uc.SetPhone(*i)
-	}
 	return uc
 }
 
@@ -82,20 +67,6 @@ func (uc *UserCreate) SetNillableVerified(b *bool) *UserCreate {
 	return uc
 }
 
-// SetDepartment sets the "department" field.
-func (uc *UserCreate) SetDepartment(s string) *UserCreate {
-	uc.mutation.SetDepartment(s)
-	return uc
-}
-
-// SetNillableDepartment sets the "department" field if the given value is not nil.
-func (uc *UserCreate) SetNillableDepartment(s *string) *UserCreate {
-	if s != nil {
-		uc.SetDepartment(*s)
-	}
-	return uc
-}
-
 // SetCreatedAt sets the "created_at" field.
 func (uc *UserCreate) SetCreatedAt(t time.Time) *UserCreate {
 	uc.mutation.SetCreatedAt(t)
@@ -123,21 +94,6 @@ func (uc *UserCreate) AddOwner(p ...*PasswordToken) *UserCreate {
 		ids[i] = p[i].ID
 	}
 	return uc.AddOwnerIDs(ids...)
-}
-
-// AddMissionIDs adds the "missions" edge to the Mission entity by IDs.
-func (uc *UserCreate) AddMissionIDs(ids ...int) *UserCreate {
-	uc.mutation.AddMissionIDs(ids...)
-	return uc
-}
-
-// AddMissions adds the "missions" edges to the Mission entity.
-func (uc *UserCreate) AddMissions(m ...*Mission) *UserCreate {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
-	}
-	return uc.AddMissionIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -268,10 +224,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
 		_node.Password = value
 	}
-	if value, ok := uc.mutation.Phone(); ok {
-		_spec.SetField(user.FieldPhone, field.TypeInt, value)
-		_node.Phone = value
-	}
 	if value, ok := uc.mutation.Admin(); ok {
 		_spec.SetField(user.FieldAdmin, field.TypeBool, value)
 		_node.Admin = value
@@ -279,10 +231,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Verified(); ok {
 		_spec.SetField(user.FieldVerified, field.TypeBool, value)
 		_node.Verified = value
-	}
-	if value, ok := uc.mutation.Department(); ok {
-		_spec.SetField(user.FieldDepartment, field.TypeString, value)
-		_node.Department = value
 	}
 	if value, ok := uc.mutation.CreatedAt(); ok {
 		_spec.SetField(user.FieldCreatedAt, field.TypeTime, value)
@@ -297,22 +245,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(passwordtoken.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := uc.mutation.MissionsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.MissionsTable,
-			Columns: []string{user.MissionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

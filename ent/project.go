@@ -5,6 +5,7 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -13,10 +14,38 @@ import (
 
 // Project is the model entity for the Project schema.
 type Project struct {
-	config
+	config `json:"-"`
 	// ID of the ent.
-	ID           int `json:"id,omitempty"`
-	selectValues sql.SelectValues
+	ID int `json:"id,omitempty"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
+	// Description holds the value of the "description" field.
+	Description string `json:"description,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the ProjectQuery when eager-loading is set.
+	Edges             ProjectEdges `json:"edges"`
+	employee_projects *int
+	selectValues      sql.SelectValues
+}
+
+// ProjectEdges holds the relations/edges for other nodes in the graph.
+type ProjectEdges struct {
+	// Missions holds the value of the missions edge.
+	Missions []*Mission `json:"missions,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// MissionsOrErr returns the Missions value or an error if the edge
+// was not loaded in eager-loading.
+func (e ProjectEdges) MissionsOrErr() ([]*Mission, error) {
+	if e.loadedTypes[0] {
+		return e.Missions, nil
+	}
+	return nil, &NotLoadedError{edge: "missions"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -25,6 +54,12 @@ func (*Project) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case project.FieldID:
+			values[i] = new(sql.NullInt64)
+		case project.FieldName, project.FieldDescription:
+			values[i] = new(sql.NullString)
+		case project.FieldCreatedAt:
+			values[i] = new(sql.NullTime)
+		case project.ForeignKeys[0]: // employee_projects
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -47,6 +82,31 @@ func (pr *Project) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			pr.ID = int(value.Int64)
+		case project.FieldName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field name", values[i])
+			} else if value.Valid {
+				pr.Name = value.String
+			}
+		case project.FieldDescription:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field description", values[i])
+			} else if value.Valid {
+				pr.Description = value.String
+			}
+		case project.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				pr.CreatedAt = value.Time
+			}
+		case project.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field employee_projects", value)
+			} else if value.Valid {
+				pr.employee_projects = new(int)
+				*pr.employee_projects = int(value.Int64)
+			}
 		default:
 			pr.selectValues.Set(columns[i], values[i])
 		}
@@ -58,6 +118,11 @@ func (pr *Project) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (pr *Project) Value(name string) (ent.Value, error) {
 	return pr.selectValues.Get(name)
+}
+
+// QueryMissions queries the "missions" edge of the Project entity.
+func (pr *Project) QueryMissions() *MissionQuery {
+	return NewProjectClient(pr.config).QueryMissions(pr)
 }
 
 // Update returns a builder for updating this Project.
@@ -82,7 +147,15 @@ func (pr *Project) Unwrap() *Project {
 func (pr *Project) String() string {
 	var builder strings.Builder
 	builder.WriteString("Project(")
-	builder.WriteString(fmt.Sprintf("id=%v", pr.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", pr.ID))
+	builder.WriteString("name=")
+	builder.WriteString(pr.Name)
+	builder.WriteString(", ")
+	builder.WriteString("description=")
+	builder.WriteString(pr.Description)
+	builder.WriteString(", ")
+	builder.WriteString("created_at=")
+	builder.WriteString(pr.CreatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

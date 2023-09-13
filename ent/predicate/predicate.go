@@ -6,6 +6,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// Employee is the predicate function for employee builders.
+type Employee func(*sql.Selector)
+
 // Mission is the predicate function for mission builders.
 type Mission func(*sql.Selector)
 

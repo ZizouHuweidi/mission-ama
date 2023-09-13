@@ -36,7 +36,10 @@ func (Mission) Fields() []ent.Field {
 // Edges of the Mission.
 func (Mission) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("employee", User.Type).
+		edge.From("employee", Employee.Type).
+			Ref("missions").
+			Unique(),
+		edge.From("project", Project.Type).
 			Ref("missions").
 			Unique(),
 	}

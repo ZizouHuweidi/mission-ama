@@ -3,7 +3,10 @@
 package mission
 
 import (
+	"time"
+
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/zizouhuweidi/mission-ama/ent/predicate"
 )
 
@@ -50,6 +53,497 @@ func IDLT(id int) predicate.Mission {
 // IDLTE applies the LTE predicate on the ID field.
 func IDLTE(id int) predicate.Mission {
 	return predicate.Mission(sql.FieldLTE(FieldID, id))
+}
+
+// Name applies equality check predicate on the "name" field. It's identical to NameEQ.
+func Name(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldEQ(FieldName, v))
+}
+
+// Purpose applies equality check predicate on the "purpose" field. It's identical to PurposeEQ.
+func Purpose(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldEQ(FieldPurpose, v))
+}
+
+// Destination applies equality check predicate on the "destination" field. It's identical to DestinationEQ.
+func Destination(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldEQ(FieldDestination, v))
+}
+
+// StartDate applies equality check predicate on the "startDate" field. It's identical to StartDateEQ.
+func StartDate(v time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldEQ(FieldStartDate, v))
+}
+
+// EndDate applies equality check predicate on the "endDate" field. It's identical to EndDateEQ.
+func EndDate(v time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldEQ(FieldEndDate, v))
+}
+
+// Transport applies equality check predicate on the "transport" field. It's identical to TransportEQ.
+func Transport(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldEQ(FieldTransport, v))
+}
+
+// CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
+func CreatedAt(v time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldEQ(FieldCreatedAt, v))
+}
+
+// NameEQ applies the EQ predicate on the "name" field.
+func NameEQ(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldEQ(FieldName, v))
+}
+
+// NameNEQ applies the NEQ predicate on the "name" field.
+func NameNEQ(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldNEQ(FieldName, v))
+}
+
+// NameIn applies the In predicate on the "name" field.
+func NameIn(vs ...string) predicate.Mission {
+	return predicate.Mission(sql.FieldIn(FieldName, vs...))
+}
+
+// NameNotIn applies the NotIn predicate on the "name" field.
+func NameNotIn(vs ...string) predicate.Mission {
+	return predicate.Mission(sql.FieldNotIn(FieldName, vs...))
+}
+
+// NameGT applies the GT predicate on the "name" field.
+func NameGT(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldGT(FieldName, v))
+}
+
+// NameGTE applies the GTE predicate on the "name" field.
+func NameGTE(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldGTE(FieldName, v))
+}
+
+// NameLT applies the LT predicate on the "name" field.
+func NameLT(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldLT(FieldName, v))
+}
+
+// NameLTE applies the LTE predicate on the "name" field.
+func NameLTE(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldLTE(FieldName, v))
+}
+
+// NameContains applies the Contains predicate on the "name" field.
+func NameContains(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldContains(FieldName, v))
+}
+
+// NameHasPrefix applies the HasPrefix predicate on the "name" field.
+func NameHasPrefix(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldHasPrefix(FieldName, v))
+}
+
+// NameHasSuffix applies the HasSuffix predicate on the "name" field.
+func NameHasSuffix(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldHasSuffix(FieldName, v))
+}
+
+// NameEqualFold applies the EqualFold predicate on the "name" field.
+func NameEqualFold(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldEqualFold(FieldName, v))
+}
+
+// NameContainsFold applies the ContainsFold predicate on the "name" field.
+func NameContainsFold(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldContainsFold(FieldName, v))
+}
+
+// PurposeEQ applies the EQ predicate on the "purpose" field.
+func PurposeEQ(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldEQ(FieldPurpose, v))
+}
+
+// PurposeNEQ applies the NEQ predicate on the "purpose" field.
+func PurposeNEQ(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldNEQ(FieldPurpose, v))
+}
+
+// PurposeIn applies the In predicate on the "purpose" field.
+func PurposeIn(vs ...string) predicate.Mission {
+	return predicate.Mission(sql.FieldIn(FieldPurpose, vs...))
+}
+
+// PurposeNotIn applies the NotIn predicate on the "purpose" field.
+func PurposeNotIn(vs ...string) predicate.Mission {
+	return predicate.Mission(sql.FieldNotIn(FieldPurpose, vs...))
+}
+
+// PurposeGT applies the GT predicate on the "purpose" field.
+func PurposeGT(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldGT(FieldPurpose, v))
+}
+
+// PurposeGTE applies the GTE predicate on the "purpose" field.
+func PurposeGTE(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldGTE(FieldPurpose, v))
+}
+
+// PurposeLT applies the LT predicate on the "purpose" field.
+func PurposeLT(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldLT(FieldPurpose, v))
+}
+
+// PurposeLTE applies the LTE predicate on the "purpose" field.
+func PurposeLTE(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldLTE(FieldPurpose, v))
+}
+
+// PurposeContains applies the Contains predicate on the "purpose" field.
+func PurposeContains(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldContains(FieldPurpose, v))
+}
+
+// PurposeHasPrefix applies the HasPrefix predicate on the "purpose" field.
+func PurposeHasPrefix(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldHasPrefix(FieldPurpose, v))
+}
+
+// PurposeHasSuffix applies the HasSuffix predicate on the "purpose" field.
+func PurposeHasSuffix(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldHasSuffix(FieldPurpose, v))
+}
+
+// PurposeIsNil applies the IsNil predicate on the "purpose" field.
+func PurposeIsNil() predicate.Mission {
+	return predicate.Mission(sql.FieldIsNull(FieldPurpose))
+}
+
+// PurposeNotNil applies the NotNil predicate on the "purpose" field.
+func PurposeNotNil() predicate.Mission {
+	return predicate.Mission(sql.FieldNotNull(FieldPurpose))
+}
+
+// PurposeEqualFold applies the EqualFold predicate on the "purpose" field.
+func PurposeEqualFold(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldEqualFold(FieldPurpose, v))
+}
+
+// PurposeContainsFold applies the ContainsFold predicate on the "purpose" field.
+func PurposeContainsFold(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldContainsFold(FieldPurpose, v))
+}
+
+// DestinationEQ applies the EQ predicate on the "destination" field.
+func DestinationEQ(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldEQ(FieldDestination, v))
+}
+
+// DestinationNEQ applies the NEQ predicate on the "destination" field.
+func DestinationNEQ(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldNEQ(FieldDestination, v))
+}
+
+// DestinationIn applies the In predicate on the "destination" field.
+func DestinationIn(vs ...string) predicate.Mission {
+	return predicate.Mission(sql.FieldIn(FieldDestination, vs...))
+}
+
+// DestinationNotIn applies the NotIn predicate on the "destination" field.
+func DestinationNotIn(vs ...string) predicate.Mission {
+	return predicate.Mission(sql.FieldNotIn(FieldDestination, vs...))
+}
+
+// DestinationGT applies the GT predicate on the "destination" field.
+func DestinationGT(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldGT(FieldDestination, v))
+}
+
+// DestinationGTE applies the GTE predicate on the "destination" field.
+func DestinationGTE(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldGTE(FieldDestination, v))
+}
+
+// DestinationLT applies the LT predicate on the "destination" field.
+func DestinationLT(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldLT(FieldDestination, v))
+}
+
+// DestinationLTE applies the LTE predicate on the "destination" field.
+func DestinationLTE(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldLTE(FieldDestination, v))
+}
+
+// DestinationContains applies the Contains predicate on the "destination" field.
+func DestinationContains(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldContains(FieldDestination, v))
+}
+
+// DestinationHasPrefix applies the HasPrefix predicate on the "destination" field.
+func DestinationHasPrefix(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldHasPrefix(FieldDestination, v))
+}
+
+// DestinationHasSuffix applies the HasSuffix predicate on the "destination" field.
+func DestinationHasSuffix(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldHasSuffix(FieldDestination, v))
+}
+
+// DestinationEqualFold applies the EqualFold predicate on the "destination" field.
+func DestinationEqualFold(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldEqualFold(FieldDestination, v))
+}
+
+// DestinationContainsFold applies the ContainsFold predicate on the "destination" field.
+func DestinationContainsFold(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldContainsFold(FieldDestination, v))
+}
+
+// StartDateEQ applies the EQ predicate on the "startDate" field.
+func StartDateEQ(v time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldEQ(FieldStartDate, v))
+}
+
+// StartDateNEQ applies the NEQ predicate on the "startDate" field.
+func StartDateNEQ(v time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldNEQ(FieldStartDate, v))
+}
+
+// StartDateIn applies the In predicate on the "startDate" field.
+func StartDateIn(vs ...time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldIn(FieldStartDate, vs...))
+}
+
+// StartDateNotIn applies the NotIn predicate on the "startDate" field.
+func StartDateNotIn(vs ...time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldNotIn(FieldStartDate, vs...))
+}
+
+// StartDateGT applies the GT predicate on the "startDate" field.
+func StartDateGT(v time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldGT(FieldStartDate, v))
+}
+
+// StartDateGTE applies the GTE predicate on the "startDate" field.
+func StartDateGTE(v time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldGTE(FieldStartDate, v))
+}
+
+// StartDateLT applies the LT predicate on the "startDate" field.
+func StartDateLT(v time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldLT(FieldStartDate, v))
+}
+
+// StartDateLTE applies the LTE predicate on the "startDate" field.
+func StartDateLTE(v time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldLTE(FieldStartDate, v))
+}
+
+// StartDateIsNil applies the IsNil predicate on the "startDate" field.
+func StartDateIsNil() predicate.Mission {
+	return predicate.Mission(sql.FieldIsNull(FieldStartDate))
+}
+
+// StartDateNotNil applies the NotNil predicate on the "startDate" field.
+func StartDateNotNil() predicate.Mission {
+	return predicate.Mission(sql.FieldNotNull(FieldStartDate))
+}
+
+// EndDateEQ applies the EQ predicate on the "endDate" field.
+func EndDateEQ(v time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldEQ(FieldEndDate, v))
+}
+
+// EndDateNEQ applies the NEQ predicate on the "endDate" field.
+func EndDateNEQ(v time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldNEQ(FieldEndDate, v))
+}
+
+// EndDateIn applies the In predicate on the "endDate" field.
+func EndDateIn(vs ...time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldIn(FieldEndDate, vs...))
+}
+
+// EndDateNotIn applies the NotIn predicate on the "endDate" field.
+func EndDateNotIn(vs ...time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldNotIn(FieldEndDate, vs...))
+}
+
+// EndDateGT applies the GT predicate on the "endDate" field.
+func EndDateGT(v time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldGT(FieldEndDate, v))
+}
+
+// EndDateGTE applies the GTE predicate on the "endDate" field.
+func EndDateGTE(v time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldGTE(FieldEndDate, v))
+}
+
+// EndDateLT applies the LT predicate on the "endDate" field.
+func EndDateLT(v time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldLT(FieldEndDate, v))
+}
+
+// EndDateLTE applies the LTE predicate on the "endDate" field.
+func EndDateLTE(v time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldLTE(FieldEndDate, v))
+}
+
+// EndDateIsNil applies the IsNil predicate on the "endDate" field.
+func EndDateIsNil() predicate.Mission {
+	return predicate.Mission(sql.FieldIsNull(FieldEndDate))
+}
+
+// EndDateNotNil applies the NotNil predicate on the "endDate" field.
+func EndDateNotNil() predicate.Mission {
+	return predicate.Mission(sql.FieldNotNull(FieldEndDate))
+}
+
+// TransportEQ applies the EQ predicate on the "transport" field.
+func TransportEQ(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldEQ(FieldTransport, v))
+}
+
+// TransportNEQ applies the NEQ predicate on the "transport" field.
+func TransportNEQ(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldNEQ(FieldTransport, v))
+}
+
+// TransportIn applies the In predicate on the "transport" field.
+func TransportIn(vs ...string) predicate.Mission {
+	return predicate.Mission(sql.FieldIn(FieldTransport, vs...))
+}
+
+// TransportNotIn applies the NotIn predicate on the "transport" field.
+func TransportNotIn(vs ...string) predicate.Mission {
+	return predicate.Mission(sql.FieldNotIn(FieldTransport, vs...))
+}
+
+// TransportGT applies the GT predicate on the "transport" field.
+func TransportGT(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldGT(FieldTransport, v))
+}
+
+// TransportGTE applies the GTE predicate on the "transport" field.
+func TransportGTE(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldGTE(FieldTransport, v))
+}
+
+// TransportLT applies the LT predicate on the "transport" field.
+func TransportLT(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldLT(FieldTransport, v))
+}
+
+// TransportLTE applies the LTE predicate on the "transport" field.
+func TransportLTE(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldLTE(FieldTransport, v))
+}
+
+// TransportContains applies the Contains predicate on the "transport" field.
+func TransportContains(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldContains(FieldTransport, v))
+}
+
+// TransportHasPrefix applies the HasPrefix predicate on the "transport" field.
+func TransportHasPrefix(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldHasPrefix(FieldTransport, v))
+}
+
+// TransportHasSuffix applies the HasSuffix predicate on the "transport" field.
+func TransportHasSuffix(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldHasSuffix(FieldTransport, v))
+}
+
+// TransportEqualFold applies the EqualFold predicate on the "transport" field.
+func TransportEqualFold(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldEqualFold(FieldTransport, v))
+}
+
+// TransportContainsFold applies the ContainsFold predicate on the "transport" field.
+func TransportContainsFold(v string) predicate.Mission {
+	return predicate.Mission(sql.FieldContainsFold(FieldTransport, v))
+}
+
+// CreatedAtEQ applies the EQ predicate on the "created_at" field.
+func CreatedAtEQ(v time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldEQ(FieldCreatedAt, v))
+}
+
+// CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
+func CreatedAtNEQ(v time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldNEQ(FieldCreatedAt, v))
+}
+
+// CreatedAtIn applies the In predicate on the "created_at" field.
+func CreatedAtIn(vs ...time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldIn(FieldCreatedAt, vs...))
+}
+
+// CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
+func CreatedAtNotIn(vs ...time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldNotIn(FieldCreatedAt, vs...))
+}
+
+// CreatedAtGT applies the GT predicate on the "created_at" field.
+func CreatedAtGT(v time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldGT(FieldCreatedAt, v))
+}
+
+// CreatedAtGTE applies the GTE predicate on the "created_at" field.
+func CreatedAtGTE(v time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldGTE(FieldCreatedAt, v))
+}
+
+// CreatedAtLT applies the LT predicate on the "created_at" field.
+func CreatedAtLT(v time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldLT(FieldCreatedAt, v))
+}
+
+// CreatedAtLTE applies the LTE predicate on the "created_at" field.
+func CreatedAtLTE(v time.Time) predicate.Mission {
+	return predicate.Mission(sql.FieldLTE(FieldCreatedAt, v))
+}
+
+// HasEmployee applies the HasEdge predicate on the "employee" edge.
+func HasEmployee() predicate.Mission {
+	return predicate.Mission(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, EmployeeTable, EmployeeColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasEmployeeWith applies the HasEdge predicate on the "employee" edge with a given conditions (other predicates).
+func HasEmployeeWith(preds ...predicate.Employee) predicate.Mission {
+	return predicate.Mission(func(s *sql.Selector) {
+		step := newEmployeeStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasProject applies the HasEdge predicate on the "project" edge.
+func HasProject() predicate.Mission {
+	return predicate.Mission(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ProjectTable, ProjectColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasProjectWith applies the HasEdge predicate on the "project" edge with a given conditions (other predicates).
+func HasProjectWith(preds ...predicate.Project) predicate.Mission {
+	return predicate.Mission(func(s *sql.Selector) {
+		step := newProjectStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

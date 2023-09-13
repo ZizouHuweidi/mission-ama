@@ -3,16 +3,15 @@ package routes
 import (
 	"net/http"
 
+	"github.com/gorilla/sessions"
+	"github.com/labstack/echo-contrib/session"
+	"github.com/labstack/echo/v4"
+	echomw "github.com/labstack/echo/v4/middleware"
+
 	"github.com/zizouhuweidi/mission-ama/config"
 	"github.com/zizouhuweidi/mission-ama/pkg/controller"
 	"github.com/zizouhuweidi/mission-ama/pkg/middleware"
 	"github.com/zizouhuweidi/mission-ama/pkg/services"
-
-	"github.com/gorilla/sessions"
-	"github.com/labstack/echo-contrib/session"
-
-	"github.com/labstack/echo/v4"
-	echomw "github.com/labstack/echo/v4/middleware"
 )
 
 // BuildRouter builds the router
@@ -68,15 +67,17 @@ func navRoutes(c *services.Container, g *echo.Group, ctr controller.Controller) 
 	home := home{Controller: ctr}
 	g.GET("/", home.Get).Name = "home"
 
-	search := search{Controller: ctr}
-	g.GET("/search", search.Get).Name = "search"
+	mission := mission{Controller: ctr}
+	g.GET("/mission", mission.Get).Name = "mission"
+	g.POST("/mission", mission.Post).Name = "mission.post"
 
-	about := about{Controller: ctr}
-	g.GET("/about", about.Get).Name = "about"
+	employee := employee{Controller: ctr}
+	g.GET("/employee", employee.Get).Name = "employee"
+	g.POST("/employee", employee.Post).Name = "employee.post"
 
-	contact := contact{Controller: ctr}
-	g.GET("/contact", contact.Get).Name = "contact"
-	g.POST("/contact", contact.Post).Name = "contact.post"
+	project := project{Controller: ctr}
+	g.GET("/project", project.Get).Name = "project"
+	g.POST("/project", project.Post).Name = "project.post"
 }
 
 func userRoutes(c *services.Container, g *echo.Group, ctr controller.Controller) {

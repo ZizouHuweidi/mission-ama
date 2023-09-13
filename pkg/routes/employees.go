@@ -9,31 +9,29 @@ import (
 )
 
 type (
-	home struct {
+	employees struct {
 		controller.Controller
 	}
 
-	post struct {
+	employeeTable struct {
 		Title string
 		Body  string
 	}
 )
 
-func (c *home) Get(ctx echo.Context) error {
+func (c *employees) Get(ctx echo.Context) error {
 	page := controller.NewPage(ctx)
 	page.Layout = "main"
-	page.Name = "home"
+	page.Name = "employees"
 	page.Metatags.Description = "Welcome to the Mission-AMA."
 	page.Metatags.Keywords = []string{"AMA", "Missions", "Web"}
-	page.Pager = controller.NewPager(ctx, 4)
-	page.Data = c.fetchPosts(&page.Pager)
+	page.Data = c.fetchEmployees()
 
 	return c.RenderPage(ctx, page)
 }
 
 // fetchPosts is an mock example of fetching posts to illustrate how paging works
-func (c *home) fetchPosts(pager *controller.Pager) []post {
-	pager.SetItems(20)
+func (c *employees) fetchEmployees() []post {
 	posts := make([]post, 20)
 
 	for k := range posts {
@@ -42,5 +40,5 @@ func (c *home) fetchPosts(pager *controller.Pager) []post {
 			Body:  fmt.Sprintf("Lorem ipsum example #%d ddolor sit amet, consectetur adipiscing elit. Nam elementum vulputate tristique.", k+1),
 		}
 	}
-	return posts[pager.GetOffset() : pager.GetOffset()+pager.ItemsPerPage]
+	return posts
 }

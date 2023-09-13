@@ -23,14 +23,10 @@ type User struct {
 	Email string `json:"email,omitempty"`
 	// Password holds the value of the "password" field.
 	Password string `json:"-"`
-	// Phone holds the value of the "phone" field.
-	Phone int `json:"phone,omitempty"`
 	// Admin holds the value of the "admin" field.
 	Admin bool `json:"admin,omitempty"`
 	// Verified holds the value of the "verified" field.
 	Verified bool `json:"verified,omitempty"`
-	// Department holds the value of the "department" field.
-	Department string `json:"department,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -43,11 +39,9 @@ type User struct {
 type UserEdges struct {
 	// Owner holds the value of the owner edge.
 	Owner []*PasswordToken `json:"owner,omitempty"`
-	// Missions holds the value of the missions edge.
-	Missions []*Mission `json:"missions,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [1]bool
 }
 
 // OwnerOrErr returns the Owner value or an error if the edge
@@ -59,15 +53,6 @@ func (e UserEdges) OwnerOrErr() ([]*PasswordToken, error) {
 	return nil, &NotLoadedError{edge: "owner"}
 }
 
-// MissionsOrErr returns the Missions value or an error if the edge
-// was not loaded in eager-loading.
-func (e UserEdges) MissionsOrErr() ([]*Mission, error) {
-	if e.loadedTypes[1] {
-		return e.Missions, nil
-	}
-	return nil, &NotLoadedError{edge: "missions"}
-}
-
 // scanValues returns the types for scanning values from sql.Rows.
 func (*User) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -75,9 +60,9 @@ func (*User) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case user.FieldAdmin, user.FieldVerified:
 			values[i] = new(sql.NullBool)
-		case user.FieldID, user.FieldPhone:
+		case user.FieldID:
 			values[i] = new(sql.NullInt64)
-		case user.FieldName, user.FieldEmail, user.FieldPassword, user.FieldDepartment:
+		case user.FieldName, user.FieldEmail, user.FieldPassword:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -120,12 +105,6 @@ func (u *User) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				u.Password = value.String
 			}
-		case user.FieldPhone:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field phone", values[i])
-			} else if value.Valid {
-				u.Phone = int(value.Int64)
-			}
 		case user.FieldAdmin:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field admin", values[i])
@@ -137,12 +116,6 @@ func (u *User) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field verified", values[i])
 			} else if value.Valid {
 				u.Verified = value.Bool
-			}
-		case user.FieldDepartment:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field department", values[i])
-			} else if value.Valid {
-				u.Department = value.String
 			}
 		case user.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -166,11 +139,6 @@ func (u *User) Value(name string) (ent.Value, error) {
 // QueryOwner queries the "owner" edge of the User entity.
 func (u *User) QueryOwner() *PasswordTokenQuery {
 	return NewUserClient(u.config).QueryOwner(u)
-}
-
-// QueryMissions queries the "missions" edge of the User entity.
-func (u *User) QueryMissions() *MissionQuery {
-	return NewUserClient(u.config).QueryMissions(u)
 }
 
 // Update returns a builder for updating this User.
@@ -204,17 +172,11 @@ func (u *User) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("password=<sensitive>")
 	builder.WriteString(", ")
-	builder.WriteString("phone=")
-	builder.WriteString(fmt.Sprintf("%v", u.Phone))
-	builder.WriteString(", ")
 	builder.WriteString("admin=")
 	builder.WriteString(fmt.Sprintf("%v", u.Admin))
 	builder.WriteString(", ")
 	builder.WriteString("verified=")
 	builder.WriteString(fmt.Sprintf("%v", u.Verified))
-	builder.WriteString(", ")
-	builder.WriteString("department=")
-	builder.WriteString(u.Department)
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(u.CreatedAt.Format(time.ANSIC))

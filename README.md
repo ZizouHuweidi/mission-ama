@@ -246,10 +246,11 @@ Ent relies on code-generation for the entities you create to provide robust, typ
 
 The two included entity types are:
 
-- User (Employee)
-- Mission
-- Project
+- User
 - PasswordToken
+- Mission
+- Employee
+- Project
 
 ### New entity type
 

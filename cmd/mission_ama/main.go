@@ -51,13 +51,6 @@ func main() {
 		}
 	}()
 
-	// Start the scheduler service to queue periodic tasks
-	go func() {
-		if err := c.Tasks.StartScheduler(); err != nil {
-			c.Web.Logger.Fatalf("scheduler shutdown: %v", err)
-		}
-	}()
-
 	// Wait for interrupt signal to gracefully shutdown the server with a timeout of 10 seconds.
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)

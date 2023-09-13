@@ -5,7 +5,10 @@ package runtime
 import (
 	"time"
 
+	"github.com/zizouhuweidi/mission-ama/ent/employee"
+	"github.com/zizouhuweidi/mission-ama/ent/mission"
 	"github.com/zizouhuweidi/mission-ama/ent/passwordtoken"
+	"github.com/zizouhuweidi/mission-ama/ent/project"
 	"github.com/zizouhuweidi/mission-ama/ent/schema"
 	"github.com/zizouhuweidi/mission-ama/ent/user"
 )
@@ -14,6 +17,38 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	employeeFields := schema.Employee{}.Fields()
+	_ = employeeFields
+	// employeeDescName is the schema descriptor for name field.
+	employeeDescName := employeeFields[0].Descriptor()
+	// employee.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	employee.NameValidator = employeeDescName.Validators[0].(func(string) error)
+	// employeeDescCSP is the schema descriptor for CSP field.
+	employeeDescCSP := employeeFields[2].Descriptor()
+	// employee.DefaultCSP holds the default value on creation for the CSP field.
+	employee.DefaultCSP = employeeDescCSP.Default.(bool)
+	// employeeDescOccupation is the schema descriptor for occupation field.
+	employeeDescOccupation := employeeFields[3].Descriptor()
+	// employee.OccupationValidator is a validator for the "occupation" field. It is called by the builders before save.
+	employee.OccupationValidator = employeeDescOccupation.Validators[0].(func(string) error)
+	// employeeDescCreatedAt is the schema descriptor for created_at field.
+	employeeDescCreatedAt := employeeFields[4].Descriptor()
+	// employee.DefaultCreatedAt holds the default value on creation for the created_at field.
+	employee.DefaultCreatedAt = employeeDescCreatedAt.Default.(func() time.Time)
+	missionFields := schema.Mission{}.Fields()
+	_ = missionFields
+	// missionDescName is the schema descriptor for name field.
+	missionDescName := missionFields[0].Descriptor()
+	// mission.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	mission.NameValidator = missionDescName.Validators[0].(func(string) error)
+	// missionDescDestination is the schema descriptor for destination field.
+	missionDescDestination := missionFields[2].Descriptor()
+	// mission.DestinationValidator is a validator for the "destination" field. It is called by the builders before save.
+	mission.DestinationValidator = missionDescDestination.Validators[0].(func(string) error)
+	// missionDescCreatedAt is the schema descriptor for created_at field.
+	missionDescCreatedAt := missionFields[6].Descriptor()
+	// mission.DefaultCreatedAt holds the default value on creation for the created_at field.
+	mission.DefaultCreatedAt = missionDescCreatedAt.Default.(func() time.Time)
 	passwordtokenFields := schema.PasswordToken{}.Fields()
 	_ = passwordtokenFields
 	// passwordtokenDescHash is the schema descriptor for hash field.
@@ -24,6 +59,20 @@ func init() {
 	passwordtokenDescCreatedAt := passwordtokenFields[1].Descriptor()
 	// passwordtoken.DefaultCreatedAt holds the default value on creation for the created_at field.
 	passwordtoken.DefaultCreatedAt = passwordtokenDescCreatedAt.Default.(func() time.Time)
+	projectFields := schema.Project{}.Fields()
+	_ = projectFields
+	// projectDescName is the schema descriptor for name field.
+	projectDescName := projectFields[0].Descriptor()
+	// project.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	project.NameValidator = projectDescName.Validators[0].(func(string) error)
+	// projectDescDescription is the schema descriptor for description field.
+	projectDescDescription := projectFields[1].Descriptor()
+	// project.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
+	project.DescriptionValidator = projectDescDescription.Validators[0].(func(string) error)
+	// projectDescCreatedAt is the schema descriptor for created_at field.
+	projectDescCreatedAt := projectFields[2].Descriptor()
+	// project.DefaultCreatedAt holds the default value on creation for the created_at field.
+	project.DefaultCreatedAt = projectDescCreatedAt.Default.(func() time.Time)
 	userHooks := schema.User{}.Hooks()
 	user.Hooks[0] = userHooks[0]
 	userFields := schema.User{}.Fields()
@@ -41,15 +90,15 @@ func init() {
 	// user.PasswordValidator is a validator for the "password" field. It is called by the builders before save.
 	user.PasswordValidator = userDescPassword.Validators[0].(func(string) error)
 	// userDescAdmin is the schema descriptor for admin field.
-	userDescAdmin := userFields[4].Descriptor()
+	userDescAdmin := userFields[3].Descriptor()
 	// user.DefaultAdmin holds the default value on creation for the admin field.
 	user.DefaultAdmin = userDescAdmin.Default.(bool)
 	// userDescVerified is the schema descriptor for verified field.
-	userDescVerified := userFields[5].Descriptor()
+	userDescVerified := userFields[4].Descriptor()
 	// user.DefaultVerified holds the default value on creation for the verified field.
 	user.DefaultVerified = userDescVerified.Default.(bool)
 	// userDescCreatedAt is the schema descriptor for created_at field.
-	userDescCreatedAt := userFields[7].Descriptor()
+	userDescCreatedAt := userFields[5].Descriptor()
 	// user.DefaultCreatedAt holds the default value on creation for the created_at field.
 	user.DefaultCreatedAt = userDescCreatedAt.Default.(func() time.Time)
 }

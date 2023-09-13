@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/zizouhuweidi/mission-ama/ent/mission"
 	"github.com/zizouhuweidi/mission-ama/ent/passwordtoken"
 	"github.com/zizouhuweidi/mission-ama/ent/predicate"
 	"github.com/zizouhuweidi/mission-ama/ent/user"
@@ -47,33 +46,6 @@ func (uu *UserUpdate) SetPassword(s string) *UserUpdate {
 	return uu
 }
 
-// SetPhone sets the "phone" field.
-func (uu *UserUpdate) SetPhone(i int) *UserUpdate {
-	uu.mutation.ResetPhone()
-	uu.mutation.SetPhone(i)
-	return uu
-}
-
-// SetNillablePhone sets the "phone" field if the given value is not nil.
-func (uu *UserUpdate) SetNillablePhone(i *int) *UserUpdate {
-	if i != nil {
-		uu.SetPhone(*i)
-	}
-	return uu
-}
-
-// AddPhone adds i to the "phone" field.
-func (uu *UserUpdate) AddPhone(i int) *UserUpdate {
-	uu.mutation.AddPhone(i)
-	return uu
-}
-
-// ClearPhone clears the value of the "phone" field.
-func (uu *UserUpdate) ClearPhone() *UserUpdate {
-	uu.mutation.ClearPhone()
-	return uu
-}
-
 // SetAdmin sets the "admin" field.
 func (uu *UserUpdate) SetAdmin(b bool) *UserUpdate {
 	uu.mutation.SetAdmin(b)
@@ -102,26 +74,6 @@ func (uu *UserUpdate) SetNillableVerified(b *bool) *UserUpdate {
 	return uu
 }
 
-// SetDepartment sets the "department" field.
-func (uu *UserUpdate) SetDepartment(s string) *UserUpdate {
-	uu.mutation.SetDepartment(s)
-	return uu
-}
-
-// SetNillableDepartment sets the "department" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableDepartment(s *string) *UserUpdate {
-	if s != nil {
-		uu.SetDepartment(*s)
-	}
-	return uu
-}
-
-// ClearDepartment clears the value of the "department" field.
-func (uu *UserUpdate) ClearDepartment() *UserUpdate {
-	uu.mutation.ClearDepartment()
-	return uu
-}
-
 // AddOwnerIDs adds the "owner" edge to the PasswordToken entity by IDs.
 func (uu *UserUpdate) AddOwnerIDs(ids ...int) *UserUpdate {
 	uu.mutation.AddOwnerIDs(ids...)
@@ -135,21 +87,6 @@ func (uu *UserUpdate) AddOwner(p ...*PasswordToken) *UserUpdate {
 		ids[i] = p[i].ID
 	}
 	return uu.AddOwnerIDs(ids...)
-}
-
-// AddMissionIDs adds the "missions" edge to the Mission entity by IDs.
-func (uu *UserUpdate) AddMissionIDs(ids ...int) *UserUpdate {
-	uu.mutation.AddMissionIDs(ids...)
-	return uu
-}
-
-// AddMissions adds the "missions" edges to the Mission entity.
-func (uu *UserUpdate) AddMissions(m ...*Mission) *UserUpdate {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
-	}
-	return uu.AddMissionIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -176,27 +113,6 @@ func (uu *UserUpdate) RemoveOwner(p ...*PasswordToken) *UserUpdate {
 		ids[i] = p[i].ID
 	}
 	return uu.RemoveOwnerIDs(ids...)
-}
-
-// ClearMissions clears all "missions" edges to the Mission entity.
-func (uu *UserUpdate) ClearMissions() *UserUpdate {
-	uu.mutation.ClearMissions()
-	return uu
-}
-
-// RemoveMissionIDs removes the "missions" edge to Mission entities by IDs.
-func (uu *UserUpdate) RemoveMissionIDs(ids ...int) *UserUpdate {
-	uu.mutation.RemoveMissionIDs(ids...)
-	return uu
-}
-
-// RemoveMissions removes "missions" edges to Mission entities.
-func (uu *UserUpdate) RemoveMissions(m ...*Mission) *UserUpdate {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
-	}
-	return uu.RemoveMissionIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -267,26 +183,11 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := uu.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
 	}
-	if value, ok := uu.mutation.Phone(); ok {
-		_spec.SetField(user.FieldPhone, field.TypeInt, value)
-	}
-	if value, ok := uu.mutation.AddedPhone(); ok {
-		_spec.AddField(user.FieldPhone, field.TypeInt, value)
-	}
-	if uu.mutation.PhoneCleared() {
-		_spec.ClearField(user.FieldPhone, field.TypeInt)
-	}
 	if value, ok := uu.mutation.Admin(); ok {
 		_spec.SetField(user.FieldAdmin, field.TypeBool, value)
 	}
 	if value, ok := uu.mutation.Verified(); ok {
 		_spec.SetField(user.FieldVerified, field.TypeBool, value)
-	}
-	if value, ok := uu.mutation.Department(); ok {
-		_spec.SetField(user.FieldDepartment, field.TypeString, value)
-	}
-	if uu.mutation.DepartmentCleared() {
-		_spec.ClearField(user.FieldDepartment, field.TypeString)
 	}
 	if uu.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -333,51 +234,6 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uu.mutation.MissionsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.MissionsTable,
-			Columns: []string{user.MissionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uu.mutation.RemovedMissionsIDs(); len(nodes) > 0 && !uu.mutation.MissionsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.MissionsTable,
-			Columns: []string{user.MissionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uu.mutation.MissionsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.MissionsTable,
-			Columns: []string{user.MissionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -416,33 +272,6 @@ func (uuo *UserUpdateOne) SetPassword(s string) *UserUpdateOne {
 	return uuo
 }
 
-// SetPhone sets the "phone" field.
-func (uuo *UserUpdateOne) SetPhone(i int) *UserUpdateOne {
-	uuo.mutation.ResetPhone()
-	uuo.mutation.SetPhone(i)
-	return uuo
-}
-
-// SetNillablePhone sets the "phone" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillablePhone(i *int) *UserUpdateOne {
-	if i != nil {
-		uuo.SetPhone(*i)
-	}
-	return uuo
-}
-
-// AddPhone adds i to the "phone" field.
-func (uuo *UserUpdateOne) AddPhone(i int) *UserUpdateOne {
-	uuo.mutation.AddPhone(i)
-	return uuo
-}
-
-// ClearPhone clears the value of the "phone" field.
-func (uuo *UserUpdateOne) ClearPhone() *UserUpdateOne {
-	uuo.mutation.ClearPhone()
-	return uuo
-}
-
 // SetAdmin sets the "admin" field.
 func (uuo *UserUpdateOne) SetAdmin(b bool) *UserUpdateOne {
 	uuo.mutation.SetAdmin(b)
@@ -471,26 +300,6 @@ func (uuo *UserUpdateOne) SetNillableVerified(b *bool) *UserUpdateOne {
 	return uuo
 }
 
-// SetDepartment sets the "department" field.
-func (uuo *UserUpdateOne) SetDepartment(s string) *UserUpdateOne {
-	uuo.mutation.SetDepartment(s)
-	return uuo
-}
-
-// SetNillableDepartment sets the "department" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableDepartment(s *string) *UserUpdateOne {
-	if s != nil {
-		uuo.SetDepartment(*s)
-	}
-	return uuo
-}
-
-// ClearDepartment clears the value of the "department" field.
-func (uuo *UserUpdateOne) ClearDepartment() *UserUpdateOne {
-	uuo.mutation.ClearDepartment()
-	return uuo
-}
-
 // AddOwnerIDs adds the "owner" edge to the PasswordToken entity by IDs.
 func (uuo *UserUpdateOne) AddOwnerIDs(ids ...int) *UserUpdateOne {
 	uuo.mutation.AddOwnerIDs(ids...)
@@ -504,21 +313,6 @@ func (uuo *UserUpdateOne) AddOwner(p ...*PasswordToken) *UserUpdateOne {
 		ids[i] = p[i].ID
 	}
 	return uuo.AddOwnerIDs(ids...)
-}
-
-// AddMissionIDs adds the "missions" edge to the Mission entity by IDs.
-func (uuo *UserUpdateOne) AddMissionIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.AddMissionIDs(ids...)
-	return uuo
-}
-
-// AddMissions adds the "missions" edges to the Mission entity.
-func (uuo *UserUpdateOne) AddMissions(m ...*Mission) *UserUpdateOne {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
-	}
-	return uuo.AddMissionIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -545,27 +339,6 @@ func (uuo *UserUpdateOne) RemoveOwner(p ...*PasswordToken) *UserUpdateOne {
 		ids[i] = p[i].ID
 	}
 	return uuo.RemoveOwnerIDs(ids...)
-}
-
-// ClearMissions clears all "missions" edges to the Mission entity.
-func (uuo *UserUpdateOne) ClearMissions() *UserUpdateOne {
-	uuo.mutation.ClearMissions()
-	return uuo
-}
-
-// RemoveMissionIDs removes the "missions" edge to Mission entities by IDs.
-func (uuo *UserUpdateOne) RemoveMissionIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.RemoveMissionIDs(ids...)
-	return uuo
-}
-
-// RemoveMissions removes "missions" edges to Mission entities.
-func (uuo *UserUpdateOne) RemoveMissions(m ...*Mission) *UserUpdateOne {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
-	}
-	return uuo.RemoveMissionIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -666,26 +439,11 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	if value, ok := uuo.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
 	}
-	if value, ok := uuo.mutation.Phone(); ok {
-		_spec.SetField(user.FieldPhone, field.TypeInt, value)
-	}
-	if value, ok := uuo.mutation.AddedPhone(); ok {
-		_spec.AddField(user.FieldPhone, field.TypeInt, value)
-	}
-	if uuo.mutation.PhoneCleared() {
-		_spec.ClearField(user.FieldPhone, field.TypeInt)
-	}
 	if value, ok := uuo.mutation.Admin(); ok {
 		_spec.SetField(user.FieldAdmin, field.TypeBool, value)
 	}
 	if value, ok := uuo.mutation.Verified(); ok {
 		_spec.SetField(user.FieldVerified, field.TypeBool, value)
-	}
-	if value, ok := uuo.mutation.Department(); ok {
-		_spec.SetField(user.FieldDepartment, field.TypeString, value)
-	}
-	if uuo.mutation.DepartmentCleared() {
-		_spec.ClearField(user.FieldDepartment, field.TypeString)
 	}
 	if uuo.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -725,51 +483,6 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(passwordtoken.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if uuo.mutation.MissionsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.MissionsTable,
-			Columns: []string{user.MissionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uuo.mutation.RemovedMissionsIDs(); len(nodes) > 0 && !uuo.mutation.MissionsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.MissionsTable,
-			Columns: []string{user.MissionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uuo.mutation.MissionsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.MissionsTable,
-			Columns: []string{user.MissionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

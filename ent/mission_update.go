@@ -6,12 +6,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/zizouhuweidi/mission-ama/ent/employee"
 	"github.com/zizouhuweidi/mission-ama/ent/mission"
 	"github.com/zizouhuweidi/mission-ama/ent/predicate"
+	"github.com/zizouhuweidi/mission-ama/ent/project"
 )
 
 // MissionUpdate is the builder for updating Mission entities.
@@ -27,9 +30,137 @@ func (mu *MissionUpdate) Where(ps ...predicate.Mission) *MissionUpdate {
 	return mu
 }
 
+// SetName sets the "name" field.
+func (mu *MissionUpdate) SetName(s string) *MissionUpdate {
+	mu.mutation.SetName(s)
+	return mu
+}
+
+// SetPurpose sets the "purpose" field.
+func (mu *MissionUpdate) SetPurpose(s string) *MissionUpdate {
+	mu.mutation.SetPurpose(s)
+	return mu
+}
+
+// SetNillablePurpose sets the "purpose" field if the given value is not nil.
+func (mu *MissionUpdate) SetNillablePurpose(s *string) *MissionUpdate {
+	if s != nil {
+		mu.SetPurpose(*s)
+	}
+	return mu
+}
+
+// ClearPurpose clears the value of the "purpose" field.
+func (mu *MissionUpdate) ClearPurpose() *MissionUpdate {
+	mu.mutation.ClearPurpose()
+	return mu
+}
+
+// SetDestination sets the "destination" field.
+func (mu *MissionUpdate) SetDestination(s string) *MissionUpdate {
+	mu.mutation.SetDestination(s)
+	return mu
+}
+
+// SetStartDate sets the "startDate" field.
+func (mu *MissionUpdate) SetStartDate(t time.Time) *MissionUpdate {
+	mu.mutation.SetStartDate(t)
+	return mu
+}
+
+// SetNillableStartDate sets the "startDate" field if the given value is not nil.
+func (mu *MissionUpdate) SetNillableStartDate(t *time.Time) *MissionUpdate {
+	if t != nil {
+		mu.SetStartDate(*t)
+	}
+	return mu
+}
+
+// ClearStartDate clears the value of the "startDate" field.
+func (mu *MissionUpdate) ClearStartDate() *MissionUpdate {
+	mu.mutation.ClearStartDate()
+	return mu
+}
+
+// SetEndDate sets the "endDate" field.
+func (mu *MissionUpdate) SetEndDate(t time.Time) *MissionUpdate {
+	mu.mutation.SetEndDate(t)
+	return mu
+}
+
+// SetNillableEndDate sets the "endDate" field if the given value is not nil.
+func (mu *MissionUpdate) SetNillableEndDate(t *time.Time) *MissionUpdate {
+	if t != nil {
+		mu.SetEndDate(*t)
+	}
+	return mu
+}
+
+// ClearEndDate clears the value of the "endDate" field.
+func (mu *MissionUpdate) ClearEndDate() *MissionUpdate {
+	mu.mutation.ClearEndDate()
+	return mu
+}
+
+// SetTransport sets the "transport" field.
+func (mu *MissionUpdate) SetTransport(s string) *MissionUpdate {
+	mu.mutation.SetTransport(s)
+	return mu
+}
+
+// SetEmployeeID sets the "employee" edge to the Employee entity by ID.
+func (mu *MissionUpdate) SetEmployeeID(id int) *MissionUpdate {
+	mu.mutation.SetEmployeeID(id)
+	return mu
+}
+
+// SetNillableEmployeeID sets the "employee" edge to the Employee entity by ID if the given value is not nil.
+func (mu *MissionUpdate) SetNillableEmployeeID(id *int) *MissionUpdate {
+	if id != nil {
+		mu = mu.SetEmployeeID(*id)
+	}
+	return mu
+}
+
+// SetEmployee sets the "employee" edge to the Employee entity.
+func (mu *MissionUpdate) SetEmployee(e *Employee) *MissionUpdate {
+	return mu.SetEmployeeID(e.ID)
+}
+
+// SetProjectID sets the "project" edge to the Project entity by ID.
+func (mu *MissionUpdate) SetProjectID(id int) *MissionUpdate {
+	mu.mutation.SetProjectID(id)
+	return mu
+}
+
+// SetNillableProjectID sets the "project" edge to the Project entity by ID if the given value is not nil.
+func (mu *MissionUpdate) SetNillableProjectID(id *int) *MissionUpdate {
+	if id != nil {
+		mu = mu.SetProjectID(*id)
+	}
+	return mu
+}
+
+// SetProject sets the "project" edge to the Project entity.
+func (mu *MissionUpdate) SetProject(p *Project) *MissionUpdate {
+	return mu.SetProjectID(p.ID)
+}
+
 // Mutation returns the MissionMutation object of the builder.
 func (mu *MissionUpdate) Mutation() *MissionMutation {
 	return mu.mutation
+}
+
+// ClearEmployee clears the "employee" edge to the Employee entity.
+func (mu *MissionUpdate) ClearEmployee() *MissionUpdate {
+	mu.mutation.ClearEmployee()
+	return mu
+}
+
+// ClearProject clears the "project" edge to the Project entity.
+func (mu *MissionUpdate) ClearProject() *MissionUpdate {
+	mu.mutation.ClearProject()
+	return mu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -59,7 +190,25 @@ func (mu *MissionUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (mu *MissionUpdate) check() error {
+	if v, ok := mu.mutation.Name(); ok {
+		if err := mission.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Mission.name": %w`, err)}
+		}
+	}
+	if v, ok := mu.mutation.Destination(); ok {
+		if err := mission.DestinationValidator(v); err != nil {
+			return &ValidationError{Name: "destination", err: fmt.Errorf(`ent: validator failed for field "Mission.destination": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (mu *MissionUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := mu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(mission.Table, mission.Columns, sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt))
 	if ps := mu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -67,6 +216,91 @@ func (mu *MissionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := mu.mutation.Name(); ok {
+		_spec.SetField(mission.FieldName, field.TypeString, value)
+	}
+	if value, ok := mu.mutation.Purpose(); ok {
+		_spec.SetField(mission.FieldPurpose, field.TypeString, value)
+	}
+	if mu.mutation.PurposeCleared() {
+		_spec.ClearField(mission.FieldPurpose, field.TypeString)
+	}
+	if value, ok := mu.mutation.Destination(); ok {
+		_spec.SetField(mission.FieldDestination, field.TypeString, value)
+	}
+	if value, ok := mu.mutation.StartDate(); ok {
+		_spec.SetField(mission.FieldStartDate, field.TypeTime, value)
+	}
+	if mu.mutation.StartDateCleared() {
+		_spec.ClearField(mission.FieldStartDate, field.TypeTime)
+	}
+	if value, ok := mu.mutation.EndDate(); ok {
+		_spec.SetField(mission.FieldEndDate, field.TypeTime, value)
+	}
+	if mu.mutation.EndDateCleared() {
+		_spec.ClearField(mission.FieldEndDate, field.TypeTime)
+	}
+	if value, ok := mu.mutation.Transport(); ok {
+		_spec.SetField(mission.FieldTransport, field.TypeString, value)
+	}
+	if mu.mutation.EmployeeCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   mission.EmployeeTable,
+			Columns: []string{mission.EmployeeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mu.mutation.EmployeeIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   mission.EmployeeTable,
+			Columns: []string{mission.EmployeeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if mu.mutation.ProjectCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   mission.ProjectTable,
+			Columns: []string{mission.ProjectColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(project.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mu.mutation.ProjectIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   mission.ProjectTable,
+			Columns: []string{mission.ProjectColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(project.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, mu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -88,9 +322,137 @@ type MissionUpdateOne struct {
 	mutation *MissionMutation
 }
 
+// SetName sets the "name" field.
+func (muo *MissionUpdateOne) SetName(s string) *MissionUpdateOne {
+	muo.mutation.SetName(s)
+	return muo
+}
+
+// SetPurpose sets the "purpose" field.
+func (muo *MissionUpdateOne) SetPurpose(s string) *MissionUpdateOne {
+	muo.mutation.SetPurpose(s)
+	return muo
+}
+
+// SetNillablePurpose sets the "purpose" field if the given value is not nil.
+func (muo *MissionUpdateOne) SetNillablePurpose(s *string) *MissionUpdateOne {
+	if s != nil {
+		muo.SetPurpose(*s)
+	}
+	return muo
+}
+
+// ClearPurpose clears the value of the "purpose" field.
+func (muo *MissionUpdateOne) ClearPurpose() *MissionUpdateOne {
+	muo.mutation.ClearPurpose()
+	return muo
+}
+
+// SetDestination sets the "destination" field.
+func (muo *MissionUpdateOne) SetDestination(s string) *MissionUpdateOne {
+	muo.mutation.SetDestination(s)
+	return muo
+}
+
+// SetStartDate sets the "startDate" field.
+func (muo *MissionUpdateOne) SetStartDate(t time.Time) *MissionUpdateOne {
+	muo.mutation.SetStartDate(t)
+	return muo
+}
+
+// SetNillableStartDate sets the "startDate" field if the given value is not nil.
+func (muo *MissionUpdateOne) SetNillableStartDate(t *time.Time) *MissionUpdateOne {
+	if t != nil {
+		muo.SetStartDate(*t)
+	}
+	return muo
+}
+
+// ClearStartDate clears the value of the "startDate" field.
+func (muo *MissionUpdateOne) ClearStartDate() *MissionUpdateOne {
+	muo.mutation.ClearStartDate()
+	return muo
+}
+
+// SetEndDate sets the "endDate" field.
+func (muo *MissionUpdateOne) SetEndDate(t time.Time) *MissionUpdateOne {
+	muo.mutation.SetEndDate(t)
+	return muo
+}
+
+// SetNillableEndDate sets the "endDate" field if the given value is not nil.
+func (muo *MissionUpdateOne) SetNillableEndDate(t *time.Time) *MissionUpdateOne {
+	if t != nil {
+		muo.SetEndDate(*t)
+	}
+	return muo
+}
+
+// ClearEndDate clears the value of the "endDate" field.
+func (muo *MissionUpdateOne) ClearEndDate() *MissionUpdateOne {
+	muo.mutation.ClearEndDate()
+	return muo
+}
+
+// SetTransport sets the "transport" field.
+func (muo *MissionUpdateOne) SetTransport(s string) *MissionUpdateOne {
+	muo.mutation.SetTransport(s)
+	return muo
+}
+
+// SetEmployeeID sets the "employee" edge to the Employee entity by ID.
+func (muo *MissionUpdateOne) SetEmployeeID(id int) *MissionUpdateOne {
+	muo.mutation.SetEmployeeID(id)
+	return muo
+}
+
+// SetNillableEmployeeID sets the "employee" edge to the Employee entity by ID if the given value is not nil.
+func (muo *MissionUpdateOne) SetNillableEmployeeID(id *int) *MissionUpdateOne {
+	if id != nil {
+		muo = muo.SetEmployeeID(*id)
+	}
+	return muo
+}
+
+// SetEmployee sets the "employee" edge to the Employee entity.
+func (muo *MissionUpdateOne) SetEmployee(e *Employee) *MissionUpdateOne {
+	return muo.SetEmployeeID(e.ID)
+}
+
+// SetProjectID sets the "project" edge to the Project entity by ID.
+func (muo *MissionUpdateOne) SetProjectID(id int) *MissionUpdateOne {
+	muo.mutation.SetProjectID(id)
+	return muo
+}
+
+// SetNillableProjectID sets the "project" edge to the Project entity by ID if the given value is not nil.
+func (muo *MissionUpdateOne) SetNillableProjectID(id *int) *MissionUpdateOne {
+	if id != nil {
+		muo = muo.SetProjectID(*id)
+	}
+	return muo
+}
+
+// SetProject sets the "project" edge to the Project entity.
+func (muo *MissionUpdateOne) SetProject(p *Project) *MissionUpdateOne {
+	return muo.SetProjectID(p.ID)
+}
+
 // Mutation returns the MissionMutation object of the builder.
 func (muo *MissionUpdateOne) Mutation() *MissionMutation {
 	return muo.mutation
+}
+
+// ClearEmployee clears the "employee" edge to the Employee entity.
+func (muo *MissionUpdateOne) ClearEmployee() *MissionUpdateOne {
+	muo.mutation.ClearEmployee()
+	return muo
+}
+
+// ClearProject clears the "project" edge to the Project entity.
+func (muo *MissionUpdateOne) ClearProject() *MissionUpdateOne {
+	muo.mutation.ClearProject()
+	return muo
 }
 
 // Where appends a list predicates to the MissionUpdate builder.
@@ -133,7 +495,25 @@ func (muo *MissionUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (muo *MissionUpdateOne) check() error {
+	if v, ok := muo.mutation.Name(); ok {
+		if err := mission.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Mission.name": %w`, err)}
+		}
+	}
+	if v, ok := muo.mutation.Destination(); ok {
+		if err := mission.DestinationValidator(v); err != nil {
+			return &ValidationError{Name: "destination", err: fmt.Errorf(`ent: validator failed for field "Mission.destination": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (muo *MissionUpdateOne) sqlSave(ctx context.Context) (_node *Mission, err error) {
+	if err := muo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(mission.Table, mission.Columns, sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt))
 	id, ok := muo.mutation.ID()
 	if !ok {
@@ -158,6 +538,91 @@ func (muo *MissionUpdateOne) sqlSave(ctx context.Context) (_node *Mission, err e
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := muo.mutation.Name(); ok {
+		_spec.SetField(mission.FieldName, field.TypeString, value)
+	}
+	if value, ok := muo.mutation.Purpose(); ok {
+		_spec.SetField(mission.FieldPurpose, field.TypeString, value)
+	}
+	if muo.mutation.PurposeCleared() {
+		_spec.ClearField(mission.FieldPurpose, field.TypeString)
+	}
+	if value, ok := muo.mutation.Destination(); ok {
+		_spec.SetField(mission.FieldDestination, field.TypeString, value)
+	}
+	if value, ok := muo.mutation.StartDate(); ok {
+		_spec.SetField(mission.FieldStartDate, field.TypeTime, value)
+	}
+	if muo.mutation.StartDateCleared() {
+		_spec.ClearField(mission.FieldStartDate, field.TypeTime)
+	}
+	if value, ok := muo.mutation.EndDate(); ok {
+		_spec.SetField(mission.FieldEndDate, field.TypeTime, value)
+	}
+	if muo.mutation.EndDateCleared() {
+		_spec.ClearField(mission.FieldEndDate, field.TypeTime)
+	}
+	if value, ok := muo.mutation.Transport(); ok {
+		_spec.SetField(mission.FieldTransport, field.TypeString, value)
+	}
+	if muo.mutation.EmployeeCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   mission.EmployeeTable,
+			Columns: []string{mission.EmployeeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := muo.mutation.EmployeeIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   mission.EmployeeTable,
+			Columns: []string{mission.EmployeeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if muo.mutation.ProjectCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   mission.ProjectTable,
+			Columns: []string{mission.ProjectColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(project.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := muo.mutation.ProjectIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   mission.ProjectTable,
+			Columns: []string{mission.ProjectColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(project.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Mission{config: muo.config}
 	_spec.Assign = _node.assignValues
