@@ -10,33 +10,33 @@ import (
 )
 
 type (
-	employee struct {
+	project struct {
 		controller.Controller
 	}
 
-	employeeForm struct {
-		Email       string `form:"email" validate:"required,email"`
-		Message     string `form:"message" validate:"required"`
-		Subemployee controller.FormSubmission
+	projectForm struct {
+		Email      string `form:"email" validate:"required,email"`
+		Message    string `form:"message" validate:"required"`
+		Submission controller.FormSubmission
 	}
 )
 
-func (c *employee) Get(ctx echo.Context) error {
+func (c *project) Get(ctx echo.Context) error {
 	page := controller.NewPage(ctx)
 	page.Layout = "main"
-	page.Name = "employee"
-	page.Title = "employee us"
-	page.Form = employeeForm{}
+	page.Name = "project"
+	page.Title = "new project"
+	page.Form = projectForm{}
 
 	if form := ctx.Get(context.FormKey); form != nil {
-		page.Form = form.(*employeeForm)
+		page.Form = form.(*projectForm)
 	}
 
 	return c.RenderPage(ctx, page)
 }
 
-func (c *employee) Post(ctx echo.Context) error {
-	var form employeeForm
+func (c *project) Post(ctx echo.Context) error {
+	var form projectForm
 	ctx.Set(context.FormKey, &form)
 
 	// Parse the form values
@@ -44,15 +44,15 @@ func (c *employee) Post(ctx echo.Context) error {
 		return c.Fail(err, "unable to bind form")
 	}
 
-	if err := form.Subemployee.Process(ctx, form); err != nil {
-		return c.Fail(err, "unable to process form subemployee")
+	if err := form.Submission.Process(ctx, form); err != nil {
+		return c.Fail(err, "unable to process form submission")
 	}
 
-	if !form.Subemployee.HasErrors() {
+	if !form.Submission.HasErrors() {
 		err := c.Container.Mail.
 			Compose().
 			To(form.Email).
-			Subject("employee form submitted").
+			Subject("project form submitted").
 			Body(fmt.Sprintf("The message is: %s", form.Message)).
 			Send(ctx)
 		if err != nil {

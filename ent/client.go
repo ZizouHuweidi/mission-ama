@@ -353,6 +353,22 @@ func (c *EmployeeClient) QueryProjects(e *Employee) *ProjectQuery {
 	return query
 }
 
+// QuerySuperviser queries the superviser edge of a Employee.
+func (c *EmployeeClient) QuerySuperviser(e *Employee) *EmployeeQuery {
+	query := (&EmployeeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(employee.Table, employee.FieldID, id),
+			sqlgraph.To(employee.Table, employee.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, employee.SuperviserTable, employee.SuperviserColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QuerySupervisee queries the supervisee edge of a Employee.
 func (c *EmployeeClient) QuerySupervisee(e *Employee) *EmployeeQuery {
 	query := (&EmployeeClient{config: c.config}).Query()
@@ -361,23 +377,7 @@ func (c *EmployeeClient) QuerySupervisee(e *Employee) *EmployeeQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(employee.Table, employee.FieldID, id),
 			sqlgraph.To(employee.Table, employee.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, employee.SuperviseeTable, employee.SuperviseeColumn),
-		)
-		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QuerySupervisor queries the supervisor edge of a Employee.
-func (c *EmployeeClient) QuerySupervisor(e *Employee) *EmployeeQuery {
-	query := (&EmployeeClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := e.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(employee.Table, employee.FieldID, id),
-			sqlgraph.To(employee.Table, employee.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, employee.SupervisorTable, employee.SupervisorColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, employee.SuperviseeTable, employee.SuperviseeColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil

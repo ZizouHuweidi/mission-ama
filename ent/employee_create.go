@@ -106,38 +106,38 @@ func (ec *EmployeeCreate) AddProjects(p ...*Project) *EmployeeCreate {
 	return ec.AddProjectIDs(ids...)
 }
 
-// SetSuperviseeID sets the "supervisee" edge to the Employee entity by ID.
-func (ec *EmployeeCreate) SetSuperviseeID(id int) *EmployeeCreate {
-	ec.mutation.SetSuperviseeID(id)
+// SetSuperviserID sets the "superviser" edge to the Employee entity by ID.
+func (ec *EmployeeCreate) SetSuperviserID(id int) *EmployeeCreate {
+	ec.mutation.SetSuperviserID(id)
 	return ec
 }
 
-// SetNillableSuperviseeID sets the "supervisee" edge to the Employee entity by ID if the given value is not nil.
-func (ec *EmployeeCreate) SetNillableSuperviseeID(id *int) *EmployeeCreate {
+// SetNillableSuperviserID sets the "superviser" edge to the Employee entity by ID if the given value is not nil.
+func (ec *EmployeeCreate) SetNillableSuperviserID(id *int) *EmployeeCreate {
 	if id != nil {
-		ec = ec.SetSuperviseeID(*id)
+		ec = ec.SetSuperviserID(*id)
 	}
 	return ec
 }
 
-// SetSupervisee sets the "supervisee" edge to the Employee entity.
-func (ec *EmployeeCreate) SetSupervisee(e *Employee) *EmployeeCreate {
-	return ec.SetSuperviseeID(e.ID)
+// SetSuperviser sets the "superviser" edge to the Employee entity.
+func (ec *EmployeeCreate) SetSuperviser(e *Employee) *EmployeeCreate {
+	return ec.SetSuperviserID(e.ID)
 }
 
-// AddSupervisorIDs adds the "supervisor" edge to the Employee entity by IDs.
-func (ec *EmployeeCreate) AddSupervisorIDs(ids ...int) *EmployeeCreate {
-	ec.mutation.AddSupervisorIDs(ids...)
+// AddSuperviseeIDs adds the "supervisee" edge to the Employee entity by IDs.
+func (ec *EmployeeCreate) AddSuperviseeIDs(ids ...int) *EmployeeCreate {
+	ec.mutation.AddSuperviseeIDs(ids...)
 	return ec
 }
 
-// AddSupervisor adds the "supervisor" edges to the Employee entity.
-func (ec *EmployeeCreate) AddSupervisor(e ...*Employee) *EmployeeCreate {
+// AddSupervisee adds the "supervisee" edges to the Employee entity.
+func (ec *EmployeeCreate) AddSupervisee(e ...*Employee) *EmployeeCreate {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return ec.AddSupervisorIDs(ids...)
+	return ec.AddSuperviseeIDs(ids...)
 }
 
 // Mutation returns the EmployeeMutation object of the builder.
@@ -287,12 +287,12 @@ func (ec *EmployeeCreate) createSpec() (*Employee, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ec.mutation.SuperviseeIDs(); len(nodes) > 0 {
+	if nodes := ec.mutation.SuperviserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   employee.SuperviseeTable,
-			Columns: []string{employee.SuperviseeColumn},
+			Table:   employee.SuperviserTable,
+			Columns: []string{employee.SuperviserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
@@ -301,15 +301,15 @@ func (ec *EmployeeCreate) createSpec() (*Employee, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.employee_supervisor = &nodes[0]
+		_node.employee_supervisee = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ec.mutation.SupervisorIDs(); len(nodes) > 0 {
+	if nodes := ec.mutation.SuperviseeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   employee.SupervisorTable,
-			Columns: []string{employee.SupervisorColumn},
+			Table:   employee.SuperviseeTable,
+			Columns: []string{employee.SuperviseeColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),

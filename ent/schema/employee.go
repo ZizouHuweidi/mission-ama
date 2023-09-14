@@ -35,8 +35,8 @@ func (Employee) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("missions", Mission.Type),
 		edge.To("projects", Project.Type),
-		edge.To("supervisor", Employee.Type).
-			From("supervisee").
+		edge.To("supervisee", Employee.Type).
+			From("superviser").
 			Unique(),
 	}
 }

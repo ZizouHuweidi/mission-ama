@@ -30,7 +30,7 @@ type Employee struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EmployeeQuery when eager-loading is set.
 	Edges               EmployeeEdges `json:"edges"`
-	employee_supervisor *int
+	employee_supervisee *int
 	selectValues        sql.SelectValues
 }
 
@@ -40,10 +40,10 @@ type EmployeeEdges struct {
 	Missions []*Mission `json:"missions,omitempty"`
 	// Projects holds the value of the projects edge.
 	Projects []*Project `json:"projects,omitempty"`
+	// Superviser holds the value of the superviser edge.
+	Superviser *Employee `json:"superviser,omitempty"`
 	// Supervisee holds the value of the supervisee edge.
-	Supervisee *Employee `json:"supervisee,omitempty"`
-	// Supervisor holds the value of the supervisor edge.
-	Supervisor []*Employee `json:"supervisor,omitempty"`
+	Supervisee []*Employee `json:"supervisee,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [4]bool
@@ -67,26 +67,26 @@ func (e EmployeeEdges) ProjectsOrErr() ([]*Project, error) {
 	return nil, &NotLoadedError{edge: "projects"}
 }
 
-// SuperviseeOrErr returns the Supervisee value or an error if the edge
+// SuperviserOrErr returns the Superviser value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e EmployeeEdges) SuperviseeOrErr() (*Employee, error) {
+func (e EmployeeEdges) SuperviserOrErr() (*Employee, error) {
 	if e.loadedTypes[2] {
-		if e.Supervisee == nil {
+		if e.Superviser == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: employee.Label}
 		}
+		return e.Superviser, nil
+	}
+	return nil, &NotLoadedError{edge: "superviser"}
+}
+
+// SuperviseeOrErr returns the Supervisee value or an error if the edge
+// was not loaded in eager-loading.
+func (e EmployeeEdges) SuperviseeOrErr() ([]*Employee, error) {
+	if e.loadedTypes[3] {
 		return e.Supervisee, nil
 	}
 	return nil, &NotLoadedError{edge: "supervisee"}
-}
-
-// SupervisorOrErr returns the Supervisor value or an error if the edge
-// was not loaded in eager-loading.
-func (e EmployeeEdges) SupervisorOrErr() ([]*Employee, error) {
-	if e.loadedTypes[3] {
-		return e.Supervisor, nil
-	}
-	return nil, &NotLoadedError{edge: "supervisor"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -102,7 +102,7 @@ func (*Employee) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case employee.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
-		case employee.ForeignKeys[0]: // employee_supervisor
+		case employee.ForeignKeys[0]: // employee_supervisee
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -157,10 +157,10 @@ func (e *Employee) assignValues(columns []string, values []any) error {
 			}
 		case employee.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field employee_supervisor", value)
+				return fmt.Errorf("unexpected type %T for edge-field employee_supervisee", value)
 			} else if value.Valid {
-				e.employee_supervisor = new(int)
-				*e.employee_supervisor = int(value.Int64)
+				e.employee_supervisee = new(int)
+				*e.employee_supervisee = int(value.Int64)
 			}
 		default:
 			e.selectValues.Set(columns[i], values[i])
@@ -185,14 +185,14 @@ func (e *Employee) QueryProjects() *ProjectQuery {
 	return NewEmployeeClient(e.config).QueryProjects(e)
 }
 
+// QuerySuperviser queries the "superviser" edge of the Employee entity.
+func (e *Employee) QuerySuperviser() *EmployeeQuery {
+	return NewEmployeeClient(e.config).QuerySuperviser(e)
+}
+
 // QuerySupervisee queries the "supervisee" edge of the Employee entity.
 func (e *Employee) QuerySupervisee() *EmployeeQuery {
 	return NewEmployeeClient(e.config).QuerySupervisee(e)
-}
-
-// QuerySupervisor queries the "supervisor" edge of the Employee entity.
-func (e *Employee) QuerySupervisor() *EmployeeQuery {
-	return NewEmployeeClient(e.config).QuerySupervisor(e)
 }
 
 // Update returns a builder for updating this Employee.

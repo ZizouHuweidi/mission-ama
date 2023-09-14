@@ -28,10 +28,10 @@ const (
 	EdgeMissions = "missions"
 	// EdgeProjects holds the string denoting the projects edge name in mutations.
 	EdgeProjects = "projects"
+	// EdgeSuperviser holds the string denoting the superviser edge name in mutations.
+	EdgeSuperviser = "superviser"
 	// EdgeSupervisee holds the string denoting the supervisee edge name in mutations.
 	EdgeSupervisee = "supervisee"
-	// EdgeSupervisor holds the string denoting the supervisor edge name in mutations.
-	EdgeSupervisor = "supervisor"
 	// Table holds the table name of the employee in the database.
 	Table = "employees"
 	// MissionsTable is the table that holds the missions relation/edge.
@@ -48,14 +48,14 @@ const (
 	ProjectsInverseTable = "projects"
 	// ProjectsColumn is the table column denoting the projects relation/edge.
 	ProjectsColumn = "employee_projects"
+	// SuperviserTable is the table that holds the superviser relation/edge.
+	SuperviserTable = "employees"
+	// SuperviserColumn is the table column denoting the superviser relation/edge.
+	SuperviserColumn = "employee_supervisee"
 	// SuperviseeTable is the table that holds the supervisee relation/edge.
 	SuperviseeTable = "employees"
 	// SuperviseeColumn is the table column denoting the supervisee relation/edge.
-	SuperviseeColumn = "employee_supervisor"
-	// SupervisorTable is the table that holds the supervisor relation/edge.
-	SupervisorTable = "employees"
-	// SupervisorColumn is the table column denoting the supervisor relation/edge.
-	SupervisorColumn = "employee_supervisor"
+	SuperviseeColumn = "employee_supervisee"
 )
 
 // Columns holds all SQL columns for employee fields.
@@ -71,7 +71,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "employees"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"employee_supervisor",
+	"employee_supervisee",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -161,24 +161,24 @@ func ByProjects(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// BySuperviseeField orders the results by supervisee field.
-func BySuperviseeField(field string, opts ...sql.OrderTermOption) OrderOption {
+// BySuperviserField orders the results by superviser field.
+func BySuperviserField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSuperviseeStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newSuperviserStep(), sql.OrderByField(field, opts...))
 	}
 }
 
-// BySupervisorCount orders the results by supervisor count.
-func BySupervisorCount(opts ...sql.OrderTermOption) OrderOption {
+// BySuperviseeCount orders the results by supervisee count.
+func BySuperviseeCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newSupervisorStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newSuperviseeStep(), opts...)
 	}
 }
 
-// BySupervisor orders the results by supervisor terms.
-func BySupervisor(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// BySupervisee orders the results by supervisee terms.
+func BySupervisee(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSupervisorStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newSuperviseeStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newMissionsStep() *sqlgraph.Step {
@@ -195,17 +195,17 @@ func newProjectsStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, false, ProjectsTable, ProjectsColumn),
 	)
 }
+func newSuperviserStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(Table, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, SuperviserTable, SuperviserColumn),
+	)
+}
 func newSuperviseeStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(Table, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, SuperviseeTable, SuperviseeColumn),
-	)
-}
-func newSupervisorStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(Table, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, SupervisorTable, SupervisorColumn),
+		sqlgraph.Edge(sqlgraph.O2M, false, SuperviseeTable, SuperviseeColumn),
 	)
 }

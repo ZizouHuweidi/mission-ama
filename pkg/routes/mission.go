@@ -25,7 +25,7 @@ func (c *mission) Get(ctx echo.Context) error {
 	page := controller.NewPage(ctx)
 	page.Layout = "main"
 	page.Name = "mission"
-	page.Title = "mission us"
+	page.Title = "new mission"
 	page.Form = missionForm{}
 
 	if form := ctx.Get(context.FormKey); form != nil {

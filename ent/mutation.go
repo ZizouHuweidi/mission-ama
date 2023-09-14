@@ -54,11 +54,11 @@ type EmployeeMutation struct {
 	projects          map[int]struct{}
 	removedprojects   map[int]struct{}
 	clearedprojects   bool
-	supervisee        *int
+	superviser        *int
+	clearedsuperviser bool
+	supervisee        map[int]struct{}
+	removedsupervisee map[int]struct{}
 	clearedsupervisee bool
-	supervisor        map[int]struct{}
-	removedsupervisor map[int]struct{}
-	clearedsupervisor bool
 	done              bool
 	oldValue          func(context.Context) (*Employee, error)
 	predicates        []predicate.Employee
@@ -483,9 +483,53 @@ func (m *EmployeeMutation) ResetProjects() {
 	m.removedprojects = nil
 }
 
-// SetSuperviseeID sets the "supervisee" edge to the Employee entity by id.
-func (m *EmployeeMutation) SetSuperviseeID(id int) {
-	m.supervisee = &id
+// SetSuperviserID sets the "superviser" edge to the Employee entity by id.
+func (m *EmployeeMutation) SetSuperviserID(id int) {
+	m.superviser = &id
+}
+
+// ClearSuperviser clears the "superviser" edge to the Employee entity.
+func (m *EmployeeMutation) ClearSuperviser() {
+	m.clearedsuperviser = true
+}
+
+// SuperviserCleared reports if the "superviser" edge to the Employee entity was cleared.
+func (m *EmployeeMutation) SuperviserCleared() bool {
+	return m.clearedsuperviser
+}
+
+// SuperviserID returns the "superviser" edge ID in the mutation.
+func (m *EmployeeMutation) SuperviserID() (id int, exists bool) {
+	if m.superviser != nil {
+		return *m.superviser, true
+	}
+	return
+}
+
+// SuperviserIDs returns the "superviser" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// SuperviserID instead. It exists only for internal usage by the builders.
+func (m *EmployeeMutation) SuperviserIDs() (ids []int) {
+	if id := m.superviser; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetSuperviser resets all changes to the "superviser" edge.
+func (m *EmployeeMutation) ResetSuperviser() {
+	m.superviser = nil
+	m.clearedsuperviser = false
+}
+
+// AddSuperviseeIDs adds the "supervisee" edge to the Employee entity by ids.
+func (m *EmployeeMutation) AddSuperviseeIDs(ids ...int) {
+	if m.supervisee == nil {
+		m.supervisee = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.supervisee[ids[i]] = struct{}{}
+	}
 }
 
 // ClearSupervisee clears the "supervisee" edge to the Employee entity.
@@ -498,20 +542,29 @@ func (m *EmployeeMutation) SuperviseeCleared() bool {
 	return m.clearedsupervisee
 }
 
-// SuperviseeID returns the "supervisee" edge ID in the mutation.
-func (m *EmployeeMutation) SuperviseeID() (id int, exists bool) {
-	if m.supervisee != nil {
-		return *m.supervisee, true
+// RemoveSuperviseeIDs removes the "supervisee" edge to the Employee entity by IDs.
+func (m *EmployeeMutation) RemoveSuperviseeIDs(ids ...int) {
+	if m.removedsupervisee == nil {
+		m.removedsupervisee = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.supervisee, ids[i])
+		m.removedsupervisee[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedSupervisee returns the removed IDs of the "supervisee" edge to the Employee entity.
+func (m *EmployeeMutation) RemovedSuperviseeIDs() (ids []int) {
+	for id := range m.removedsupervisee {
+		ids = append(ids, id)
 	}
 	return
 }
 
 // SuperviseeIDs returns the "supervisee" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// SuperviseeID instead. It exists only for internal usage by the builders.
 func (m *EmployeeMutation) SuperviseeIDs() (ids []int) {
-	if id := m.supervisee; id != nil {
-		ids = append(ids, *id)
+	for id := range m.supervisee {
+		ids = append(ids, id)
 	}
 	return
 }
@@ -520,60 +573,7 @@ func (m *EmployeeMutation) SuperviseeIDs() (ids []int) {
 func (m *EmployeeMutation) ResetSupervisee() {
 	m.supervisee = nil
 	m.clearedsupervisee = false
-}
-
-// AddSupervisorIDs adds the "supervisor" edge to the Employee entity by ids.
-func (m *EmployeeMutation) AddSupervisorIDs(ids ...int) {
-	if m.supervisor == nil {
-		m.supervisor = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.supervisor[ids[i]] = struct{}{}
-	}
-}
-
-// ClearSupervisor clears the "supervisor" edge to the Employee entity.
-func (m *EmployeeMutation) ClearSupervisor() {
-	m.clearedsupervisor = true
-}
-
-// SupervisorCleared reports if the "supervisor" edge to the Employee entity was cleared.
-func (m *EmployeeMutation) SupervisorCleared() bool {
-	return m.clearedsupervisor
-}
-
-// RemoveSupervisorIDs removes the "supervisor" edge to the Employee entity by IDs.
-func (m *EmployeeMutation) RemoveSupervisorIDs(ids ...int) {
-	if m.removedsupervisor == nil {
-		m.removedsupervisor = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.supervisor, ids[i])
-		m.removedsupervisor[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedSupervisor returns the removed IDs of the "supervisor" edge to the Employee entity.
-func (m *EmployeeMutation) RemovedSupervisorIDs() (ids []int) {
-	for id := range m.removedsupervisor {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// SupervisorIDs returns the "supervisor" edge IDs in the mutation.
-func (m *EmployeeMutation) SupervisorIDs() (ids []int) {
-	for id := range m.supervisor {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetSupervisor resets all changes to the "supervisor" edge.
-func (m *EmployeeMutation) ResetSupervisor() {
-	m.supervisor = nil
-	m.clearedsupervisor = false
-	m.removedsupervisor = nil
+	m.removedsupervisee = nil
 }
 
 // Where appends a list predicates to the EmployeeMutation builder.
@@ -808,11 +808,11 @@ func (m *EmployeeMutation) AddedEdges() []string {
 	if m.projects != nil {
 		edges = append(edges, employee.EdgeProjects)
 	}
+	if m.superviser != nil {
+		edges = append(edges, employee.EdgeSuperviser)
+	}
 	if m.supervisee != nil {
 		edges = append(edges, employee.EdgeSupervisee)
-	}
-	if m.supervisor != nil {
-		edges = append(edges, employee.EdgeSupervisor)
 	}
 	return edges
 }
@@ -833,13 +833,13 @@ func (m *EmployeeMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case employee.EdgeSupervisee:
-		if id := m.supervisee; id != nil {
+	case employee.EdgeSuperviser:
+		if id := m.superviser; id != nil {
 			return []ent.Value{*id}
 		}
-	case employee.EdgeSupervisor:
-		ids := make([]ent.Value, 0, len(m.supervisor))
-		for id := range m.supervisor {
+	case employee.EdgeSupervisee:
+		ids := make([]ent.Value, 0, len(m.supervisee))
+		for id := range m.supervisee {
 			ids = append(ids, id)
 		}
 		return ids
@@ -856,8 +856,8 @@ func (m *EmployeeMutation) RemovedEdges() []string {
 	if m.removedprojects != nil {
 		edges = append(edges, employee.EdgeProjects)
 	}
-	if m.removedsupervisor != nil {
-		edges = append(edges, employee.EdgeSupervisor)
+	if m.removedsupervisee != nil {
+		edges = append(edges, employee.EdgeSupervisee)
 	}
 	return edges
 }
@@ -878,9 +878,9 @@ func (m *EmployeeMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case employee.EdgeSupervisor:
-		ids := make([]ent.Value, 0, len(m.removedsupervisor))
-		for id := range m.removedsupervisor {
+	case employee.EdgeSupervisee:
+		ids := make([]ent.Value, 0, len(m.removedsupervisee))
+		for id := range m.removedsupervisee {
 			ids = append(ids, id)
 		}
 		return ids
@@ -897,11 +897,11 @@ func (m *EmployeeMutation) ClearedEdges() []string {
 	if m.clearedprojects {
 		edges = append(edges, employee.EdgeProjects)
 	}
+	if m.clearedsuperviser {
+		edges = append(edges, employee.EdgeSuperviser)
+	}
 	if m.clearedsupervisee {
 		edges = append(edges, employee.EdgeSupervisee)
-	}
-	if m.clearedsupervisor {
-		edges = append(edges, employee.EdgeSupervisor)
 	}
 	return edges
 }
@@ -914,10 +914,10 @@ func (m *EmployeeMutation) EdgeCleared(name string) bool {
 		return m.clearedmissions
 	case employee.EdgeProjects:
 		return m.clearedprojects
+	case employee.EdgeSuperviser:
+		return m.clearedsuperviser
 	case employee.EdgeSupervisee:
 		return m.clearedsupervisee
-	case employee.EdgeSupervisor:
-		return m.clearedsupervisor
 	}
 	return false
 }
@@ -926,8 +926,8 @@ func (m *EmployeeMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *EmployeeMutation) ClearEdge(name string) error {
 	switch name {
-	case employee.EdgeSupervisee:
-		m.ClearSupervisee()
+	case employee.EdgeSuperviser:
+		m.ClearSuperviser()
 		return nil
 	}
 	return fmt.Errorf("unknown Employee unique edge %s", name)
@@ -943,11 +943,11 @@ func (m *EmployeeMutation) ResetEdge(name string) error {
 	case employee.EdgeProjects:
 		m.ResetProjects()
 		return nil
+	case employee.EdgeSuperviser:
+		m.ResetSuperviser()
+		return nil
 	case employee.EdgeSupervisee:
 		m.ResetSupervisee()
-		return nil
-	case employee.EdgeSupervisor:
-		m.ResetSupervisor()
 		return nil
 	}
 	return fmt.Errorf("unknown Employee edge %s", name)

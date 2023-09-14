@@ -23,9 +23,9 @@
                         <p class="menu-label">General</p>
                         <ul class="menu-list">
                             <li>{{link (call .ToURL "home") "Home" .Path}}</li>
-                            <li>{{link (call .ToURL "missions") "Missions" .Path}}</li>
 
                             {{- if .IsAuth}}
+                            <li>{{link (call .ToURL "missions") "Missions" .Path}}</li>
                             <li>{{link (call .ToURL "employees") "Employees" .Path}}</li>
                             <li>{{link (call .ToURL "projects") "Projects" .Path}}</li>
 
@@ -36,9 +36,9 @@
 
                         <p class="menu-label">Pages</p>
                         <ul class="menu-list">
-                                <li>{{link (call .ToURL "newMission") "New Mission" .Path}}</li>
-                                <li>{{link (call .ToURL "newProject") "New Project" .Path}}</li>
-                                <li>{{link (call .ToURL "newEmployee") "New Employee" .Path}}</li>
+                                <li>{{link (call .ToURL "mission") "New Mission" .Path}}</li>
+                                <li>{{link (call .ToURL "employee") "New Employee" .Path}}</li>
+                                <li>{{link (call .ToURL "project") "New Project" .Path}}</li>
                             {{- end}}
                         </ul>
                         <p class="menu-label">Account</p>

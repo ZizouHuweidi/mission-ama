@@ -16,7 +16,7 @@ var (
 		{Name: "csp", Type: field.TypeBool, Default: false},
 		{Name: "occupation", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "employee_supervisor", Type: field.TypeInt, Nullable: true},
+		{Name: "employee_supervisee", Type: field.TypeInt, Nullable: true},
 	}
 	// EmployeesTable holds the schema information for the "employees" table.
 	EmployeesTable = &schema.Table{
@@ -25,7 +25,7 @@ var (
 		PrimaryKey: []*schema.Column{EmployeesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "employees_employees_supervisor",
+				Symbol:     "employees_employees_supervisee",
 				Columns:    []*schema.Column{EmployeesColumns[6]},
 				RefColumns: []*schema.Column{EmployeesColumns[0]},
 				OnDelete:   schema.SetNull,

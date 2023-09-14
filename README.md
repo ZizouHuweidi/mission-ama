@@ -645,10 +645,10 @@ Then, in your _GET_ handler, extract the form from the context so it can be pass
 
 ```go
 page := controller.NewPage(ctx)
-page.Form = ContactForm{}
+page.Form = MissionForm{}
 
 if form := ctx.Get(context.FormKey); form != nil {
-    page.Form = form.(*ContactForm)
+    page.Form = form.(*MissionForm)
 }
 ```
 

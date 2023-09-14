@@ -67,13 +67,22 @@ func navRoutes(c *services.Container, g *echo.Group, ctr controller.Controller) 
 	home := home{Controller: ctr}
 	g.GET("/", home.Get).Name = "home"
 
+	missions := missions{Controller: ctr}
+	g.GET("/missions", missions.Get).Name = "missions"
+
 	mission := mission{Controller: ctr}
 	g.GET("/mission", mission.Get).Name = "mission"
 	g.POST("/mission", mission.Post).Name = "mission.post"
 
+	employees := employees{Controller: ctr}
+	g.GET("/employees", employees.Get).Name = "employees"
+
 	employee := employee{Controller: ctr}
 	g.GET("/employee", employee.Get).Name = "employee"
 	g.POST("/employee", employee.Post).Name = "employee.post"
+
+	projects := projects{Controller: ctr}
+	g.GET("/projects", projects.Get).Name = "projects"
 
 	project := project{Controller: ctr}
 	g.GET("/project", project.Get).Name = "project"

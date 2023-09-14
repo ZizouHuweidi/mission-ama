@@ -26,8 +26,8 @@ type EmployeeQuery struct {
 	predicates     []predicate.Employee
 	withMissions   *MissionQuery
 	withProjects   *ProjectQuery
+	withSuperviser *EmployeeQuery
 	withSupervisee *EmployeeQuery
-	withSupervisor *EmployeeQuery
 	withFKs        bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -109,6 +109,28 @@ func (eq *EmployeeQuery) QueryProjects() *ProjectQuery {
 	return query
 }
 
+// QuerySuperviser chains the current query on the "superviser" edge.
+func (eq *EmployeeQuery) QuerySuperviser() *EmployeeQuery {
+	query := (&EmployeeClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(employee.Table, employee.FieldID, selector),
+			sqlgraph.To(employee.Table, employee.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, employee.SuperviserTable, employee.SuperviserColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QuerySupervisee chains the current query on the "supervisee" edge.
 func (eq *EmployeeQuery) QuerySupervisee() *EmployeeQuery {
 	query := (&EmployeeClient{config: eq.config}).Query()
@@ -123,29 +145,7 @@ func (eq *EmployeeQuery) QuerySupervisee() *EmployeeQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(employee.Table, employee.FieldID, selector),
 			sqlgraph.To(employee.Table, employee.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, employee.SuperviseeTable, employee.SuperviseeColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QuerySupervisor chains the current query on the "supervisor" edge.
-func (eq *EmployeeQuery) QuerySupervisor() *EmployeeQuery {
-	query := (&EmployeeClient{config: eq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := eq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := eq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(employee.Table, employee.FieldID, selector),
-			sqlgraph.To(employee.Table, employee.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, employee.SupervisorTable, employee.SupervisorColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, employee.SuperviseeTable, employee.SuperviseeColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -347,8 +347,8 @@ func (eq *EmployeeQuery) Clone() *EmployeeQuery {
 		predicates:     append([]predicate.Employee{}, eq.predicates...),
 		withMissions:   eq.withMissions.Clone(),
 		withProjects:   eq.withProjects.Clone(),
+		withSuperviser: eq.withSuperviser.Clone(),
 		withSupervisee: eq.withSupervisee.Clone(),
-		withSupervisor: eq.withSupervisor.Clone(),
 		// clone intermediate query.
 		sql:  eq.sql.Clone(),
 		path: eq.path,
@@ -377,6 +377,17 @@ func (eq *EmployeeQuery) WithProjects(opts ...func(*ProjectQuery)) *EmployeeQuer
 	return eq
 }
 
+// WithSuperviser tells the query-builder to eager-load the nodes that are connected to
+// the "superviser" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EmployeeQuery) WithSuperviser(opts ...func(*EmployeeQuery)) *EmployeeQuery {
+	query := (&EmployeeClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withSuperviser = query
+	return eq
+}
+
 // WithSupervisee tells the query-builder to eager-load the nodes that are connected to
 // the "supervisee" edge. The optional arguments are used to configure the query builder of the edge.
 func (eq *EmployeeQuery) WithSupervisee(opts ...func(*EmployeeQuery)) *EmployeeQuery {
@@ -385,17 +396,6 @@ func (eq *EmployeeQuery) WithSupervisee(opts ...func(*EmployeeQuery)) *EmployeeQ
 		opt(query)
 	}
 	eq.withSupervisee = query
-	return eq
-}
-
-// WithSupervisor tells the query-builder to eager-load the nodes that are connected to
-// the "supervisor" edge. The optional arguments are used to configure the query builder of the edge.
-func (eq *EmployeeQuery) WithSupervisor(opts ...func(*EmployeeQuery)) *EmployeeQuery {
-	query := (&EmployeeClient{config: eq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	eq.withSupervisor = query
 	return eq
 }
 
@@ -481,11 +481,11 @@ func (eq *EmployeeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Emp
 		loadedTypes = [4]bool{
 			eq.withMissions != nil,
 			eq.withProjects != nil,
+			eq.withSuperviser != nil,
 			eq.withSupervisee != nil,
-			eq.withSupervisor != nil,
 		}
 	)
-	if eq.withSupervisee != nil {
+	if eq.withSuperviser != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -523,16 +523,16 @@ func (eq *EmployeeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Emp
 			return nil, err
 		}
 	}
-	if query := eq.withSupervisee; query != nil {
-		if err := eq.loadSupervisee(ctx, query, nodes, nil,
-			func(n *Employee, e *Employee) { n.Edges.Supervisee = e }); err != nil {
+	if query := eq.withSuperviser; query != nil {
+		if err := eq.loadSuperviser(ctx, query, nodes, nil,
+			func(n *Employee, e *Employee) { n.Edges.Superviser = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := eq.withSupervisor; query != nil {
-		if err := eq.loadSupervisor(ctx, query, nodes,
-			func(n *Employee) { n.Edges.Supervisor = []*Employee{} },
-			func(n *Employee, e *Employee) { n.Edges.Supervisor = append(n.Edges.Supervisor, e) }); err != nil {
+	if query := eq.withSupervisee; query != nil {
+		if err := eq.loadSupervisee(ctx, query, nodes,
+			func(n *Employee) { n.Edges.Supervisee = []*Employee{} },
+			func(n *Employee, e *Employee) { n.Edges.Supervisee = append(n.Edges.Supervisee, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -601,14 +601,14 @@ func (eq *EmployeeQuery) loadProjects(ctx context.Context, query *ProjectQuery, 
 	}
 	return nil
 }
-func (eq *EmployeeQuery) loadSupervisee(ctx context.Context, query *EmployeeQuery, nodes []*Employee, init func(*Employee), assign func(*Employee, *Employee)) error {
+func (eq *EmployeeQuery) loadSuperviser(ctx context.Context, query *EmployeeQuery, nodes []*Employee, init func(*Employee), assign func(*Employee, *Employee)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Employee)
 	for i := range nodes {
-		if nodes[i].employee_supervisor == nil {
+		if nodes[i].employee_supervisee == nil {
 			continue
 		}
-		fk := *nodes[i].employee_supervisor
+		fk := *nodes[i].employee_supervisee
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -625,7 +625,7 @@ func (eq *EmployeeQuery) loadSupervisee(ctx context.Context, query *EmployeeQuer
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "employee_supervisor" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "employee_supervisee" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -633,7 +633,7 @@ func (eq *EmployeeQuery) loadSupervisee(ctx context.Context, query *EmployeeQuer
 	}
 	return nil
 }
-func (eq *EmployeeQuery) loadSupervisor(ctx context.Context, query *EmployeeQuery, nodes []*Employee, init func(*Employee), assign func(*Employee, *Employee)) error {
+func (eq *EmployeeQuery) loadSupervisee(ctx context.Context, query *EmployeeQuery, nodes []*Employee, init func(*Employee), assign func(*Employee, *Employee)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Employee)
 	for i := range nodes {
@@ -645,20 +645,20 @@ func (eq *EmployeeQuery) loadSupervisor(ctx context.Context, query *EmployeeQuer
 	}
 	query.withFKs = true
 	query.Where(predicate.Employee(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(employee.SupervisorColumn), fks...))
+		s.Where(sql.InValues(s.C(employee.SuperviseeColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.employee_supervisor
+		fk := n.employee_supervisee
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "employee_supervisor" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "employee_supervisee" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "employee_supervisor" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "employee_supervisee" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
