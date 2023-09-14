@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"fmt"
-
 	"github.com/labstack/echo/v4"
 
 	"github.com/zizouhuweidi/mission-ama/pkg/context"
@@ -15,9 +13,9 @@ type (
 	}
 
 	projectForm struct {
-		Email      string `form:"email" validate:"required,email"`
-		Message    string `form:"message" validate:"required"`
-		Submission controller.FormSubmission
+		Name        string `form:"name" validate:"required"`
+		Description string `form:"name" validate:"required"`
+		Submission  controller.FormSubmission
 	}
 )
 
@@ -25,7 +23,7 @@ func (c *project) Get(ctx echo.Context) error {
 	page := controller.NewPage(ctx)
 	page.Layout = "main"
 	page.Name = "project"
-	page.Title = "new project"
+	page.Title = "New Project"
 	page.Form = projectForm{}
 
 	if form := ctx.Get(context.FormKey); form != nil {
@@ -48,16 +46,21 @@ func (c *project) Post(ctx echo.Context) error {
 		return c.Fail(err, "unable to process form submission")
 	}
 
-	if !form.Submission.HasErrors() {
-		err := c.Container.Mail.
-			Compose().
-			To(form.Email).
-			Subject("project form submitted").
-			Body(fmt.Sprintf("The message is: %s", form.Message)).
-			Send(ctx)
-		if err != nil {
-			return c.Fail(err, "unable to send email")
-		}
+	if form.Submission.HasErrors() {
+		return c.Get(ctx)
+	}
+
+	e, err := c.Container.ORM.Project.
+		Create().
+		SetName(form.Name).
+		SetDescription(form.Description).
+		Save(ctx.Request().Context())
+
+	switch err.(type) {
+	case nil:
+		ctx.Logger().Infof("Project created: %s", e.Name)
+	default:
+		return c.Fail(err, "unable to create project")
 	}
 
 	return c.Get(ctx)

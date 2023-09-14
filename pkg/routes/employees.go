@@ -23,22 +23,20 @@ func (c *employees) Get(ctx echo.Context) error {
 	page := controller.NewPage(ctx)
 	page.Layout = "main"
 	page.Name = "employees"
-	page.Metatags.Description = "Welcome to the Mission-AMA."
-	page.Metatags.Keywords = []string{"AMA", "Missions", "Web"}
-	page.Data = c.fetchEmployees()
+	page.Title = "AMA Employees"
+	page.Data = c.fetchEmployees(ctx)
 
 	return c.RenderPage(ctx, page)
 }
 
 // fetchPosts is an mock example of fetching posts to illustrate how paging works
-func (c *employees) fetchEmployees() []post {
-	posts := make([]post, 20)
-
-	for k := range posts {
-		posts[k] = post{
-			Title: fmt.Sprintf("Post example #%d", k+1),
-			Body:  fmt.Sprintf("Lorem ipsum example #%d ddolor sit amet, consectetur adipiscing elit. Nam elementum vulputate tristique.", k+1),
-		}
+func (c *employees) fetchEmployees(ctx echo.Context) error {
+	m, err := c.Container.ORM.Employee.Query().All(ctx.Request().Context())
+	if err != nil {
+		return c.Fail(err, "unable to fetch employees")
 	}
-	return posts
+
+	fmt.Print(m)
+
+	return c.Get(ctx)
 }

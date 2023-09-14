@@ -13,7 +13,7 @@ type (
 		controller.Controller
 	}
 
-	projectsTable struct {
+	projectTable struct {
 		Title string
 		Body  string
 	}
@@ -23,22 +23,20 @@ func (c *projects) Get(ctx echo.Context) error {
 	page := controller.NewPage(ctx)
 	page.Layout = "main"
 	page.Name = "projects"
-	page.Metatags.Description = "Welcome to the Mission-AMA."
-	page.Metatags.Keywords = []string{"AMA", "Missions", "Web"}
-	page.Data = c.fetchProjects()
+	page.Title = "AMA Projects"
+	page.Data = c.fetchProjects(ctx)
 
 	return c.RenderPage(ctx, page)
 }
 
 // fetchPosts is an mock example of fetching posts to illustrate how paging works
-func (c *projects) fetchProjects() []post {
-	posts := make([]post, 20)
-
-	for k := range posts {
-		posts[k] = post{
-			Title: fmt.Sprintf("Post example #%d", k+1),
-			Body:  fmt.Sprintf("Lorem ipsum example #%d ddolor sit amet, consectetur adipiscing elit. Nam elementum vulputate tristique.", k+1),
-		}
+func (c *projects) fetchProjects(ctx echo.Context) error {
+	p, err := c.Container.ORM.Project.Query().All(ctx.Request().Context())
+	if err != nil {
+		return c.Fail(err, "unable to fetch projects")
 	}
-	return posts
+
+	fmt.Print(p)
+
+	return c.Get(ctx)
 }

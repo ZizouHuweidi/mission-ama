@@ -27,6 +27,7 @@ func (c *employee) Get(ctx echo.Context) error {
 	page.Layout = "main"
 	page.Name = "employee"
 	page.Title = "new employee"
+	// page.Data = c.fetchEmployees()
 	page.Form = employeeForm{}
 
 	if form := ctx.Get(context.FormKey); form != nil {
@@ -35,6 +36,10 @@ func (c *employee) Get(ctx echo.Context) error {
 
 	return c.RenderPage(ctx, page)
 }
+
+// func (c *employees) fetchEmployees() []string {
+//   e, err := c.Container.ORM.Employee.Query().All
+// }
 
 func (c *employee) Post(ctx echo.Context) error {
 	var form employeeForm

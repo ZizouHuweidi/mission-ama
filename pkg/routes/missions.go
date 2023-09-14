@@ -13,7 +13,7 @@ type (
 		controller.Controller
 	}
 
-	missionsTable struct {
+	missionTable struct {
 		Title string
 		Body  string
 	}
@@ -23,22 +23,20 @@ func (c *missions) Get(ctx echo.Context) error {
 	page := controller.NewPage(ctx)
 	page.Layout = "main"
 	page.Name = "missions"
-	page.Metatags.Description = "Welcome to the Mission-AMA."
-	page.Metatags.Keywords = []string{"AMA", "Missions", "Web"}
-	page.Data = c.fetchMissions()
+	page.Title = "AMA Missions"
+	page.Data = c.fetchMissions(ctx)
 
 	return c.RenderPage(ctx, page)
 }
 
 // fetchPosts is an mock example of fetching posts to illustrate how paging works
-func (c *missions) fetchMissions() []post {
-	posts := make([]post, 20)
-
-	for k := range posts {
-		posts[k] = post{
-			Title: fmt.Sprintf("Post example #%d", k+1),
-			Body:  fmt.Sprintf("Lorem ipsum example #%d ddolor sit amet, consectetur adipiscing elit. Nam elementum vulputate tristique.", k+1),
-		}
+func (c *missions) fetchMissions(ctx echo.Context) error {
+	m, err := c.Container.ORM.Mission.Query().All(ctx.Request().Context())
+	if err != nil {
+		return c.Fail(err, "unable to fetch missions")
 	}
-	return posts
+
+	fmt.Print(m)
+
+	return c.Get(ctx)
 }
