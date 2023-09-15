@@ -123,7 +123,7 @@ Ensure the following are installed on your system:
 After checking out the repository, from within the root, start the Docker containers for the database and cache by executing `make up`:
 
 ```
-git clone git@github.com:zizouhuweidi/mission-ama.git
+git clone https://github.com/ZizouHuweidi/mission-ama
 cd mission-ama
 make up
 ```

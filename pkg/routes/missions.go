@@ -24,7 +24,7 @@ func (c *missions) Get(ctx echo.Context) error {
 	page.Layout = "main"
 	page.Name = "missions"
 	page.Title = "AMA Missions"
-	page.Data = c.fetchMissions(ctx)
+	// page.Data = c.fetchMissions(ctx)
 
 	return c.RenderPage(ctx, page)
 }

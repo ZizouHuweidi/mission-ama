@@ -26,7 +26,7 @@ func (c *employee) Get(ctx echo.Context) error {
 	page := controller.NewPage(ctx)
 	page.Layout = "main"
 	page.Name = "employee"
-	page.Title = "new employee"
+	page.Title = "New Employee"
 	// page.Data = c.fetchEmployees()
 	page.Form = employeeForm{}
 

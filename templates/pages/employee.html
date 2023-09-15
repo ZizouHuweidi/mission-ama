@@ -1,5 +1,5 @@
 {{define "content"}}
-    {{- if not (eq .HTMX.Request.Target "contact")}}
+    {{- if not (eq .HTMX.Request.Target "employee")}}
         <article class="message is-link">
             <div class="message-body">
                 <p>This is an example of a form with inline, server-side validation and HTMX-powered AJAX submissions without writing a single line of JavaScript.</p>
@@ -15,29 +15,45 @@
     {{- if .Form.Submission.IsDone}}
         <article class="message is-large is-success">
             <div class="message-header">
-                <p>Thank you!</p>
-            </div>
-            <div class="message-body">
-                No email was actually sent but this entire operation was handled server-side and degrades without JavaScript enabled.
+                <p>Employee is created!</p>
             </div>
         </article>
     {{- else}}
-        <form id="contact" method="post" hx-post="{{call .ToURL "contact.post"}}">
+        <form id="employee" method="post" hx-post="{{call .ToURL "employee.post"}}">
             <div class="field">
-                <label for="email" class="label">Email address</label>
+                <label for="phone" class="label">Name</label>
                 <div class="control">
-                    <input id="email" name="email" type="email" class="input {{.Form.Submission.GetFieldStatusClass "Email"}}" value="{{.Form.Email}}">
+                    <input id="name" name="name" type="text" class="input {{.Form.Submission.GetFieldStatusClass "Name"}}" value="{{.Form.Name}}">
                 </div>
-                {{template "field-errors" (.Form.Submission.GetFieldErrors "Email")}}
+                {{template "field-errors" (.Form.Submission.GetFieldErrors "Name")}}
             </div>
 
             <div class="field">
-                <label for="message" class="label">Message</label>
+                <label for="phone" class="label">Phone</label>
                 <div class="control">
-                    <textarea id="message" name="message" class="textarea {{.Form.Submission.GetFieldStatusClass "Message"}}">{{.Form.Message}}</textarea>
+                    <input id="phone" name="phone" type="number" class="input {{.Form.Submission.GetFieldStatusClass "Phone"}}" value="{{.Form.Phone}}">
                 </div>
-                {{template "field-errors" (.Form.Submission.GetFieldErrors "Message")}}
+                {{template "field-errors" (.Form.Submission.GetFieldErrors "Phone")}}
             </div>
+
+            <div class="select">
+                <label for="name" class="label">Occupation</label>
+                <div class="control">
+                  <select>
+                    <input id="occupation" name="phone" type="text" class="input {{.Form.Submission.GetFieldStatusClass "Occupation"}}" value="{{.Form.Occupation}}">
+                </div>
+                    
+                  </select>
+                {{template "field-errors" (.Form.Submission.GetFieldErrors "Occupation")}}
+            </div>
+  
+            <div class="is-8">
+                <label for="CSP" class="checkbox">
+                    <input id="CSP" name="CSP" type="checkbox"  value="{{.Form.CSP}}">
+                  CSP
+                <label/>
+            </div>
+
 
             <div class="field is-grouped">
                 <div class="control">

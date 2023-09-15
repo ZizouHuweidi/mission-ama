@@ -24,7 +24,7 @@ func (c *projects) Get(ctx echo.Context) error {
 	page.Layout = "main"
 	page.Name = "projects"
 	page.Title = "AMA Projects"
-	page.Data = c.fetchProjects(ctx)
+	// page.Data = c.fetchProjects(ctx)
 
 	return c.RenderPage(ctx, page)
 }
