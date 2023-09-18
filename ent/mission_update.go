@@ -247,7 +247,7 @@ func (mu *MissionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if mu.mutation.EmployeeCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   mission.EmployeeTable,
 			Columns: []string{mission.EmployeeColumn},
 			Bidi:    false,
@@ -260,7 +260,7 @@ func (mu *MissionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := mu.mutation.EmployeeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   mission.EmployeeTable,
 			Columns: []string{mission.EmployeeColumn},
 			Bidi:    false,
@@ -276,7 +276,7 @@ func (mu *MissionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if mu.mutation.ProjectCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   mission.ProjectTable,
 			Columns: []string{mission.ProjectColumn},
 			Bidi:    false,
@@ -289,7 +289,7 @@ func (mu *MissionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := mu.mutation.ProjectIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   mission.ProjectTable,
 			Columns: []string{mission.ProjectColumn},
 			Bidi:    false,
@@ -569,7 +569,7 @@ func (muo *MissionUpdateOne) sqlSave(ctx context.Context) (_node *Mission, err e
 	if muo.mutation.EmployeeCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   mission.EmployeeTable,
 			Columns: []string{mission.EmployeeColumn},
 			Bidi:    false,
@@ -582,7 +582,7 @@ func (muo *MissionUpdateOne) sqlSave(ctx context.Context) (_node *Mission, err e
 	if nodes := muo.mutation.EmployeeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   mission.EmployeeTable,
 			Columns: []string{mission.EmployeeColumn},
 			Bidi:    false,
@@ -598,7 +598,7 @@ func (muo *MissionUpdateOne) sqlSave(ctx context.Context) (_node *Mission, err e
 	if muo.mutation.ProjectCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   mission.ProjectTable,
 			Columns: []string{mission.ProjectColumn},
 			Bidi:    false,
@@ -611,7 +611,7 @@ func (muo *MissionUpdateOne) sqlSave(ctx context.Context) (_node *Mission, err e
 	if nodes := muo.mutation.ProjectIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   mission.ProjectTable,
 			Columns: []string{mission.ProjectColumn},
 			Bidi:    false,

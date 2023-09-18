@@ -13,9 +13,15 @@ type (
 	}
 
 	missionForm struct {
-		Name       string `form:"name" validate:"required"`
-		ProjectID  int    `form:"projectID"`
-		Submission controller.FormSubmission
+		Name        string `form:"name" validate:"required"`
+		Purpose     string `form:"purpose"`
+		Destination string `form:"destination"`
+		startDate   string `form:"startDate"`
+		endDate     string `form:"endDate"`
+		Transport   string `form:"transport"`
+		EmployeeID  int    `form:"projectID"`
+		ProjectID   int    `form:"projectID"`
+		Submission  controller.FormSubmission
 	}
 )
 

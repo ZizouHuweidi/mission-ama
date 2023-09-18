@@ -321,63 +321,15 @@ func (c *EmployeeClient) GetX(ctx context.Context, id int) *Employee {
 	return obj
 }
 
-// QueryMissions queries the missions edge of a Employee.
-func (c *EmployeeClient) QueryMissions(e *Employee) *MissionQuery {
+// QueryMission queries the mission edge of a Employee.
+func (c *EmployeeClient) QueryMission(e *Employee) *MissionQuery {
 	query := (&MissionClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := e.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(employee.Table, employee.FieldID, id),
 			sqlgraph.To(mission.Table, mission.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, employee.MissionsTable, employee.MissionsColumn),
-		)
-		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryProjects queries the projects edge of a Employee.
-func (c *EmployeeClient) QueryProjects(e *Employee) *ProjectQuery {
-	query := (&ProjectClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := e.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(employee.Table, employee.FieldID, id),
-			sqlgraph.To(project.Table, project.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, employee.ProjectsTable, employee.ProjectsColumn),
-		)
-		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QuerySuperviser queries the superviser edge of a Employee.
-func (c *EmployeeClient) QuerySuperviser(e *Employee) *EmployeeQuery {
-	query := (&EmployeeClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := e.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(employee.Table, employee.FieldID, id),
-			sqlgraph.To(employee.Table, employee.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, employee.SuperviserTable, employee.SuperviserColumn),
-		)
-		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QuerySupervisee queries the supervisee edge of a Employee.
-func (c *EmployeeClient) QuerySupervisee(e *Employee) *EmployeeQuery {
-	query := (&EmployeeClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := e.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(employee.Table, employee.FieldID, id),
-			sqlgraph.To(employee.Table, employee.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, employee.SuperviseeTable, employee.SuperviseeColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, employee.MissionTable, employee.MissionColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -511,7 +463,7 @@ func (c *MissionClient) QueryEmployee(m *Mission) *EmployeeQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(mission.Table, mission.FieldID, id),
 			sqlgraph.To(employee.Table, employee.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, mission.EmployeeTable, mission.EmployeeColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, mission.EmployeeTable, mission.EmployeeColumn),
 		)
 		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
 		return fromV, nil
@@ -527,7 +479,7 @@ func (c *MissionClient) QueryProject(m *Mission) *ProjectQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(mission.Table, mission.FieldID, id),
 			sqlgraph.To(project.Table, project.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, mission.ProjectTable, mission.ProjectColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, mission.ProjectTable, mission.ProjectColumn),
 		)
 		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
 		return fromV, nil
@@ -795,7 +747,7 @@ func (c *ProjectClient) QueryMissions(pr *Project) *MissionQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(project.Table, project.FieldID, id),
 			sqlgraph.To(mission.Table, mission.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, project.MissionsTable, project.MissionsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, project.MissionsTable, project.MissionsColumn),
 		)
 		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
 		return fromV, nil

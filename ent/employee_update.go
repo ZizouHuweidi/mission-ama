@@ -13,7 +13,6 @@ import (
 	"github.com/zizouhuweidi/mission-ama/ent/employee"
 	"github.com/zizouhuweidi/mission-ama/ent/mission"
 	"github.com/zizouhuweidi/mission-ama/ent/predicate"
-	"github.com/zizouhuweidi/mission-ama/ent/project"
 )
 
 // EmployeeUpdate is the builder for updating Employee entities.
@@ -82,14 +81,14 @@ func (eu *EmployeeUpdate) ClearOccupation() *EmployeeUpdate {
 	return eu
 }
 
-// AddMissionIDs adds the "missions" edge to the Mission entity by IDs.
+// AddMissionIDs adds the "mission" edge to the Mission entity by IDs.
 func (eu *EmployeeUpdate) AddMissionIDs(ids ...int) *EmployeeUpdate {
 	eu.mutation.AddMissionIDs(ids...)
 	return eu
 }
 
-// AddMissions adds the "missions" edges to the Mission entity.
-func (eu *EmployeeUpdate) AddMissions(m ...*Mission) *EmployeeUpdate {
+// AddMission adds the "mission" edges to the Mission entity.
+func (eu *EmployeeUpdate) AddMission(m ...*Mission) *EmployeeUpdate {
 	ids := make([]int, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
@@ -97,127 +96,30 @@ func (eu *EmployeeUpdate) AddMissions(m ...*Mission) *EmployeeUpdate {
 	return eu.AddMissionIDs(ids...)
 }
 
-// AddProjectIDs adds the "projects" edge to the Project entity by IDs.
-func (eu *EmployeeUpdate) AddProjectIDs(ids ...int) *EmployeeUpdate {
-	eu.mutation.AddProjectIDs(ids...)
-	return eu
-}
-
-// AddProjects adds the "projects" edges to the Project entity.
-func (eu *EmployeeUpdate) AddProjects(p ...*Project) *EmployeeUpdate {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return eu.AddProjectIDs(ids...)
-}
-
-// SetSuperviserID sets the "superviser" edge to the Employee entity by ID.
-func (eu *EmployeeUpdate) SetSuperviserID(id int) *EmployeeUpdate {
-	eu.mutation.SetSuperviserID(id)
-	return eu
-}
-
-// SetNillableSuperviserID sets the "superviser" edge to the Employee entity by ID if the given value is not nil.
-func (eu *EmployeeUpdate) SetNillableSuperviserID(id *int) *EmployeeUpdate {
-	if id != nil {
-		eu = eu.SetSuperviserID(*id)
-	}
-	return eu
-}
-
-// SetSuperviser sets the "superviser" edge to the Employee entity.
-func (eu *EmployeeUpdate) SetSuperviser(e *Employee) *EmployeeUpdate {
-	return eu.SetSuperviserID(e.ID)
-}
-
-// AddSuperviseeIDs adds the "supervisee" edge to the Employee entity by IDs.
-func (eu *EmployeeUpdate) AddSuperviseeIDs(ids ...int) *EmployeeUpdate {
-	eu.mutation.AddSuperviseeIDs(ids...)
-	return eu
-}
-
-// AddSupervisee adds the "supervisee" edges to the Employee entity.
-func (eu *EmployeeUpdate) AddSupervisee(e ...*Employee) *EmployeeUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return eu.AddSuperviseeIDs(ids...)
-}
-
 // Mutation returns the EmployeeMutation object of the builder.
 func (eu *EmployeeUpdate) Mutation() *EmployeeMutation {
 	return eu.mutation
 }
 
-// ClearMissions clears all "missions" edges to the Mission entity.
-func (eu *EmployeeUpdate) ClearMissions() *EmployeeUpdate {
-	eu.mutation.ClearMissions()
+// ClearMission clears all "mission" edges to the Mission entity.
+func (eu *EmployeeUpdate) ClearMission() *EmployeeUpdate {
+	eu.mutation.ClearMission()
 	return eu
 }
 
-// RemoveMissionIDs removes the "missions" edge to Mission entities by IDs.
+// RemoveMissionIDs removes the "mission" edge to Mission entities by IDs.
 func (eu *EmployeeUpdate) RemoveMissionIDs(ids ...int) *EmployeeUpdate {
 	eu.mutation.RemoveMissionIDs(ids...)
 	return eu
 }
 
-// RemoveMissions removes "missions" edges to Mission entities.
-func (eu *EmployeeUpdate) RemoveMissions(m ...*Mission) *EmployeeUpdate {
+// RemoveMission removes "mission" edges to Mission entities.
+func (eu *EmployeeUpdate) RemoveMission(m ...*Mission) *EmployeeUpdate {
 	ids := make([]int, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
 	return eu.RemoveMissionIDs(ids...)
-}
-
-// ClearProjects clears all "projects" edges to the Project entity.
-func (eu *EmployeeUpdate) ClearProjects() *EmployeeUpdate {
-	eu.mutation.ClearProjects()
-	return eu
-}
-
-// RemoveProjectIDs removes the "projects" edge to Project entities by IDs.
-func (eu *EmployeeUpdate) RemoveProjectIDs(ids ...int) *EmployeeUpdate {
-	eu.mutation.RemoveProjectIDs(ids...)
-	return eu
-}
-
-// RemoveProjects removes "projects" edges to Project entities.
-func (eu *EmployeeUpdate) RemoveProjects(p ...*Project) *EmployeeUpdate {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return eu.RemoveProjectIDs(ids...)
-}
-
-// ClearSuperviser clears the "superviser" edge to the Employee entity.
-func (eu *EmployeeUpdate) ClearSuperviser() *EmployeeUpdate {
-	eu.mutation.ClearSuperviser()
-	return eu
-}
-
-// ClearSupervisee clears all "supervisee" edges to the Employee entity.
-func (eu *EmployeeUpdate) ClearSupervisee() *EmployeeUpdate {
-	eu.mutation.ClearSupervisee()
-	return eu
-}
-
-// RemoveSuperviseeIDs removes the "supervisee" edge to Employee entities by IDs.
-func (eu *EmployeeUpdate) RemoveSuperviseeIDs(ids ...int) *EmployeeUpdate {
-	eu.mutation.RemoveSuperviseeIDs(ids...)
-	return eu
-}
-
-// RemoveSupervisee removes "supervisee" edges to Employee entities.
-func (eu *EmployeeUpdate) RemoveSupervisee(e ...*Employee) *EmployeeUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return eu.RemoveSuperviseeIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -292,147 +194,28 @@ func (eu *EmployeeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if eu.mutation.OccupationCleared() {
 		_spec.ClearField(employee.FieldOccupation, field.TypeString)
 	}
-	if eu.mutation.MissionsCleared() {
+	if eu.mutation.MissionCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   employee.MissionsTable,
-			Columns: []string{employee.MissionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.RemovedMissionsIDs(); len(nodes) > 0 && !eu.mutation.MissionsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   employee.MissionsTable,
-			Columns: []string{employee.MissionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.MissionsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   employee.MissionsTable,
-			Columns: []string{employee.MissionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if eu.mutation.ProjectsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   employee.ProjectsTable,
-			Columns: []string{employee.ProjectsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(project.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.RemovedProjectsIDs(); len(nodes) > 0 && !eu.mutation.ProjectsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   employee.ProjectsTable,
-			Columns: []string{employee.ProjectsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(project.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.ProjectsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   employee.ProjectsTable,
-			Columns: []string{employee.ProjectsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(project.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if eu.mutation.SuperviserCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   employee.SuperviserTable,
-			Columns: []string{employee.SuperviserColumn},
+			Table:   employee.MissionTable,
+			Columns: []string{employee.MissionColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eu.mutation.SuperviserIDs(); len(nodes) > 0 {
+	if nodes := eu.mutation.RemovedMissionIDs(); len(nodes) > 0 && !eu.mutation.MissionCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   employee.SuperviserTable,
-			Columns: []string{employee.SuperviserColumn},
+			Table:   employee.MissionTable,
+			Columns: []string{employee.MissionColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if eu.mutation.SuperviseeCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   employee.SuperviseeTable,
-			Columns: []string{employee.SuperviseeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.RemovedSuperviseeIDs(); len(nodes) > 0 && !eu.mutation.SuperviseeCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   employee.SuperviseeTable,
-			Columns: []string{employee.SuperviseeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -440,15 +223,15 @@ func (eu *EmployeeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eu.mutation.SuperviseeIDs(); len(nodes) > 0 {
+	if nodes := eu.mutation.MissionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   employee.SuperviseeTable,
-			Columns: []string{employee.SuperviseeColumn},
+			Inverse: true,
+			Table:   employee.MissionTable,
+			Columns: []string{employee.MissionColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -529,14 +312,14 @@ func (euo *EmployeeUpdateOne) ClearOccupation() *EmployeeUpdateOne {
 	return euo
 }
 
-// AddMissionIDs adds the "missions" edge to the Mission entity by IDs.
+// AddMissionIDs adds the "mission" edge to the Mission entity by IDs.
 func (euo *EmployeeUpdateOne) AddMissionIDs(ids ...int) *EmployeeUpdateOne {
 	euo.mutation.AddMissionIDs(ids...)
 	return euo
 }
 
-// AddMissions adds the "missions" edges to the Mission entity.
-func (euo *EmployeeUpdateOne) AddMissions(m ...*Mission) *EmployeeUpdateOne {
+// AddMission adds the "mission" edges to the Mission entity.
+func (euo *EmployeeUpdateOne) AddMission(m ...*Mission) *EmployeeUpdateOne {
 	ids := make([]int, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
@@ -544,127 +327,30 @@ func (euo *EmployeeUpdateOne) AddMissions(m ...*Mission) *EmployeeUpdateOne {
 	return euo.AddMissionIDs(ids...)
 }
 
-// AddProjectIDs adds the "projects" edge to the Project entity by IDs.
-func (euo *EmployeeUpdateOne) AddProjectIDs(ids ...int) *EmployeeUpdateOne {
-	euo.mutation.AddProjectIDs(ids...)
-	return euo
-}
-
-// AddProjects adds the "projects" edges to the Project entity.
-func (euo *EmployeeUpdateOne) AddProjects(p ...*Project) *EmployeeUpdateOne {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return euo.AddProjectIDs(ids...)
-}
-
-// SetSuperviserID sets the "superviser" edge to the Employee entity by ID.
-func (euo *EmployeeUpdateOne) SetSuperviserID(id int) *EmployeeUpdateOne {
-	euo.mutation.SetSuperviserID(id)
-	return euo
-}
-
-// SetNillableSuperviserID sets the "superviser" edge to the Employee entity by ID if the given value is not nil.
-func (euo *EmployeeUpdateOne) SetNillableSuperviserID(id *int) *EmployeeUpdateOne {
-	if id != nil {
-		euo = euo.SetSuperviserID(*id)
-	}
-	return euo
-}
-
-// SetSuperviser sets the "superviser" edge to the Employee entity.
-func (euo *EmployeeUpdateOne) SetSuperviser(e *Employee) *EmployeeUpdateOne {
-	return euo.SetSuperviserID(e.ID)
-}
-
-// AddSuperviseeIDs adds the "supervisee" edge to the Employee entity by IDs.
-func (euo *EmployeeUpdateOne) AddSuperviseeIDs(ids ...int) *EmployeeUpdateOne {
-	euo.mutation.AddSuperviseeIDs(ids...)
-	return euo
-}
-
-// AddSupervisee adds the "supervisee" edges to the Employee entity.
-func (euo *EmployeeUpdateOne) AddSupervisee(e ...*Employee) *EmployeeUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return euo.AddSuperviseeIDs(ids...)
-}
-
 // Mutation returns the EmployeeMutation object of the builder.
 func (euo *EmployeeUpdateOne) Mutation() *EmployeeMutation {
 	return euo.mutation
 }
 
-// ClearMissions clears all "missions" edges to the Mission entity.
-func (euo *EmployeeUpdateOne) ClearMissions() *EmployeeUpdateOne {
-	euo.mutation.ClearMissions()
+// ClearMission clears all "mission" edges to the Mission entity.
+func (euo *EmployeeUpdateOne) ClearMission() *EmployeeUpdateOne {
+	euo.mutation.ClearMission()
 	return euo
 }
 
-// RemoveMissionIDs removes the "missions" edge to Mission entities by IDs.
+// RemoveMissionIDs removes the "mission" edge to Mission entities by IDs.
 func (euo *EmployeeUpdateOne) RemoveMissionIDs(ids ...int) *EmployeeUpdateOne {
 	euo.mutation.RemoveMissionIDs(ids...)
 	return euo
 }
 
-// RemoveMissions removes "missions" edges to Mission entities.
-func (euo *EmployeeUpdateOne) RemoveMissions(m ...*Mission) *EmployeeUpdateOne {
+// RemoveMission removes "mission" edges to Mission entities.
+func (euo *EmployeeUpdateOne) RemoveMission(m ...*Mission) *EmployeeUpdateOne {
 	ids := make([]int, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
 	return euo.RemoveMissionIDs(ids...)
-}
-
-// ClearProjects clears all "projects" edges to the Project entity.
-func (euo *EmployeeUpdateOne) ClearProjects() *EmployeeUpdateOne {
-	euo.mutation.ClearProjects()
-	return euo
-}
-
-// RemoveProjectIDs removes the "projects" edge to Project entities by IDs.
-func (euo *EmployeeUpdateOne) RemoveProjectIDs(ids ...int) *EmployeeUpdateOne {
-	euo.mutation.RemoveProjectIDs(ids...)
-	return euo
-}
-
-// RemoveProjects removes "projects" edges to Project entities.
-func (euo *EmployeeUpdateOne) RemoveProjects(p ...*Project) *EmployeeUpdateOne {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return euo.RemoveProjectIDs(ids...)
-}
-
-// ClearSuperviser clears the "superviser" edge to the Employee entity.
-func (euo *EmployeeUpdateOne) ClearSuperviser() *EmployeeUpdateOne {
-	euo.mutation.ClearSuperviser()
-	return euo
-}
-
-// ClearSupervisee clears all "supervisee" edges to the Employee entity.
-func (euo *EmployeeUpdateOne) ClearSupervisee() *EmployeeUpdateOne {
-	euo.mutation.ClearSupervisee()
-	return euo
-}
-
-// RemoveSuperviseeIDs removes the "supervisee" edge to Employee entities by IDs.
-func (euo *EmployeeUpdateOne) RemoveSuperviseeIDs(ids ...int) *EmployeeUpdateOne {
-	euo.mutation.RemoveSuperviseeIDs(ids...)
-	return euo
-}
-
-// RemoveSupervisee removes "supervisee" edges to Employee entities.
-func (euo *EmployeeUpdateOne) RemoveSupervisee(e ...*Employee) *EmployeeUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return euo.RemoveSuperviseeIDs(ids...)
 }
 
 // Where appends a list predicates to the EmployeeUpdate builder.
@@ -769,147 +455,28 @@ func (euo *EmployeeUpdateOne) sqlSave(ctx context.Context) (_node *Employee, err
 	if euo.mutation.OccupationCleared() {
 		_spec.ClearField(employee.FieldOccupation, field.TypeString)
 	}
-	if euo.mutation.MissionsCleared() {
+	if euo.mutation.MissionCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   employee.MissionsTable,
-			Columns: []string{employee.MissionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.RemovedMissionsIDs(); len(nodes) > 0 && !euo.mutation.MissionsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   employee.MissionsTable,
-			Columns: []string{employee.MissionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.MissionsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   employee.MissionsTable,
-			Columns: []string{employee.MissionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if euo.mutation.ProjectsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   employee.ProjectsTable,
-			Columns: []string{employee.ProjectsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(project.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.RemovedProjectsIDs(); len(nodes) > 0 && !euo.mutation.ProjectsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   employee.ProjectsTable,
-			Columns: []string{employee.ProjectsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(project.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.ProjectsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   employee.ProjectsTable,
-			Columns: []string{employee.ProjectsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(project.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if euo.mutation.SuperviserCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   employee.SuperviserTable,
-			Columns: []string{employee.SuperviserColumn},
+			Table:   employee.MissionTable,
+			Columns: []string{employee.MissionColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := euo.mutation.SuperviserIDs(); len(nodes) > 0 {
+	if nodes := euo.mutation.RemovedMissionIDs(); len(nodes) > 0 && !euo.mutation.MissionCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   employee.SuperviserTable,
-			Columns: []string{employee.SuperviserColumn},
+			Table:   employee.MissionTable,
+			Columns: []string{employee.MissionColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if euo.mutation.SuperviseeCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   employee.SuperviseeTable,
-			Columns: []string{employee.SuperviseeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.RemovedSuperviseeIDs(); len(nodes) > 0 && !euo.mutation.SuperviseeCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   employee.SuperviseeTable,
-			Columns: []string{employee.SuperviseeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -917,15 +484,15 @@ func (euo *EmployeeUpdateOne) sqlSave(ctx context.Context) (_node *Employee, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := euo.mutation.SuperviseeIDs(); len(nodes) > 0 {
+	if nodes := euo.mutation.MissionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   employee.SuperviseeTable,
-			Columns: []string{employee.SuperviseeColumn},
+			Inverse: true,
+			Table:   employee.MissionTable,
+			Columns: []string{employee.MissionColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(mission.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

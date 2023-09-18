@@ -16,21 +16,12 @@ var (
 		{Name: "csp", Type: field.TypeBool, Default: false},
 		{Name: "occupation", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "employee_supervisee", Type: field.TypeInt, Nullable: true},
 	}
 	// EmployeesTable holds the schema information for the "employees" table.
 	EmployeesTable = &schema.Table{
 		Name:       "employees",
 		Columns:    EmployeesColumns,
 		PrimaryKey: []*schema.Column{EmployeesColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "employees_employees_supervisee",
-				Columns:    []*schema.Column{EmployeesColumns[6]},
-				RefColumns: []*schema.Column{EmployeesColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
 	}
 	// MissionsColumns holds the columns for the "missions" table.
 	MissionsColumns = []*schema.Column{
@@ -42,8 +33,8 @@ var (
 		{Name: "end_date", Type: field.TypeTime, Nullable: true},
 		{Name: "transport", Type: field.TypeString},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "employee_missions", Type: field.TypeInt, Nullable: true},
-		{Name: "project_missions", Type: field.TypeInt, Nullable: true},
+		{Name: "mission_employee", Type: field.TypeInt, Nullable: true},
+		{Name: "mission_project", Type: field.TypeInt, Nullable: true},
 	}
 	// MissionsTable holds the schema information for the "missions" table.
 	MissionsTable = &schema.Table{
@@ -52,13 +43,13 @@ var (
 		PrimaryKey: []*schema.Column{MissionsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "missions_employees_missions",
+				Symbol:     "missions_employees_employee",
 				Columns:    []*schema.Column{MissionsColumns[8]},
 				RefColumns: []*schema.Column{EmployeesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "missions_projects_missions",
+				Symbol:     "missions_projects_project",
 				Columns:    []*schema.Column{MissionsColumns[9]},
 				RefColumns: []*schema.Column{ProjectsColumns[0]},
 				OnDelete:   schema.SetNull,
@@ -92,21 +83,12 @@ var (
 		{Name: "name", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "employee_projects", Type: field.TypeInt, Nullable: true},
 	}
 	// ProjectsTable holds the schema information for the "projects" table.
 	ProjectsTable = &schema.Table{
 		Name:       "projects",
 		Columns:    ProjectsColumns,
 		PrimaryKey: []*schema.Column{ProjectsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "projects_employees_projects",
-				Columns:    []*schema.Column{ProjectsColumns[4]},
-				RefColumns: []*schema.Column{EmployeesColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
 	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
@@ -135,9 +117,7 @@ var (
 )
 
 func init() {
-	EmployeesTable.ForeignKeys[0].RefTable = EmployeesTable
 	MissionsTable.ForeignKeys[0].RefTable = EmployeesTable
 	MissionsTable.ForeignKeys[1].RefTable = ProjectsTable
 	PasswordTokensTable.ForeignKeys[0].RefTable = UsersTable
-	ProjectsTable.ForeignKeys[0].RefTable = EmployeesTable
 }

@@ -14,21 +14,16 @@ import (
 	"github.com/zizouhuweidi/mission-ama/ent/employee"
 	"github.com/zizouhuweidi/mission-ama/ent/mission"
 	"github.com/zizouhuweidi/mission-ama/ent/predicate"
-	"github.com/zizouhuweidi/mission-ama/ent/project"
 )
 
 // EmployeeQuery is the builder for querying Employee entities.
 type EmployeeQuery struct {
 	config
-	ctx            *QueryContext
-	order          []employee.OrderOption
-	inters         []Interceptor
-	predicates     []predicate.Employee
-	withMissions   *MissionQuery
-	withProjects   *ProjectQuery
-	withSuperviser *EmployeeQuery
-	withSupervisee *EmployeeQuery
-	withFKs        bool
+	ctx         *QueryContext
+	order       []employee.OrderOption
+	inters      []Interceptor
+	predicates  []predicate.Employee
+	withMission *MissionQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -65,8 +60,8 @@ func (eq *EmployeeQuery) Order(o ...employee.OrderOption) *EmployeeQuery {
 	return eq
 }
 
-// QueryMissions chains the current query on the "missions" edge.
-func (eq *EmployeeQuery) QueryMissions() *MissionQuery {
+// QueryMission chains the current query on the "mission" edge.
+func (eq *EmployeeQuery) QueryMission() *MissionQuery {
 	query := (&MissionClient{config: eq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := eq.prepareQuery(ctx); err != nil {
@@ -79,73 +74,7 @@ func (eq *EmployeeQuery) QueryMissions() *MissionQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(employee.Table, employee.FieldID, selector),
 			sqlgraph.To(mission.Table, mission.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, employee.MissionsTable, employee.MissionsColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryProjects chains the current query on the "projects" edge.
-func (eq *EmployeeQuery) QueryProjects() *ProjectQuery {
-	query := (&ProjectClient{config: eq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := eq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := eq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(employee.Table, employee.FieldID, selector),
-			sqlgraph.To(project.Table, project.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, employee.ProjectsTable, employee.ProjectsColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QuerySuperviser chains the current query on the "superviser" edge.
-func (eq *EmployeeQuery) QuerySuperviser() *EmployeeQuery {
-	query := (&EmployeeClient{config: eq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := eq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := eq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(employee.Table, employee.FieldID, selector),
-			sqlgraph.To(employee.Table, employee.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, employee.SuperviserTable, employee.SuperviserColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QuerySupervisee chains the current query on the "supervisee" edge.
-func (eq *EmployeeQuery) QuerySupervisee() *EmployeeQuery {
-	query := (&EmployeeClient{config: eq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := eq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := eq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(employee.Table, employee.FieldID, selector),
-			sqlgraph.To(employee.Table, employee.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, employee.SuperviseeTable, employee.SuperviseeColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, employee.MissionTable, employee.MissionColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -340,62 +269,26 @@ func (eq *EmployeeQuery) Clone() *EmployeeQuery {
 		return nil
 	}
 	return &EmployeeQuery{
-		config:         eq.config,
-		ctx:            eq.ctx.Clone(),
-		order:          append([]employee.OrderOption{}, eq.order...),
-		inters:         append([]Interceptor{}, eq.inters...),
-		predicates:     append([]predicate.Employee{}, eq.predicates...),
-		withMissions:   eq.withMissions.Clone(),
-		withProjects:   eq.withProjects.Clone(),
-		withSuperviser: eq.withSuperviser.Clone(),
-		withSupervisee: eq.withSupervisee.Clone(),
+		config:      eq.config,
+		ctx:         eq.ctx.Clone(),
+		order:       append([]employee.OrderOption{}, eq.order...),
+		inters:      append([]Interceptor{}, eq.inters...),
+		predicates:  append([]predicate.Employee{}, eq.predicates...),
+		withMission: eq.withMission.Clone(),
 		// clone intermediate query.
 		sql:  eq.sql.Clone(),
 		path: eq.path,
 	}
 }
 
-// WithMissions tells the query-builder to eager-load the nodes that are connected to
-// the "missions" edge. The optional arguments are used to configure the query builder of the edge.
-func (eq *EmployeeQuery) WithMissions(opts ...func(*MissionQuery)) *EmployeeQuery {
+// WithMission tells the query-builder to eager-load the nodes that are connected to
+// the "mission" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EmployeeQuery) WithMission(opts ...func(*MissionQuery)) *EmployeeQuery {
 	query := (&MissionClient{config: eq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	eq.withMissions = query
-	return eq
-}
-
-// WithProjects tells the query-builder to eager-load the nodes that are connected to
-// the "projects" edge. The optional arguments are used to configure the query builder of the edge.
-func (eq *EmployeeQuery) WithProjects(opts ...func(*ProjectQuery)) *EmployeeQuery {
-	query := (&ProjectClient{config: eq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	eq.withProjects = query
-	return eq
-}
-
-// WithSuperviser tells the query-builder to eager-load the nodes that are connected to
-// the "superviser" edge. The optional arguments are used to configure the query builder of the edge.
-func (eq *EmployeeQuery) WithSuperviser(opts ...func(*EmployeeQuery)) *EmployeeQuery {
-	query := (&EmployeeClient{config: eq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	eq.withSuperviser = query
-	return eq
-}
-
-// WithSupervisee tells the query-builder to eager-load the nodes that are connected to
-// the "supervisee" edge. The optional arguments are used to configure the query builder of the edge.
-func (eq *EmployeeQuery) WithSupervisee(opts ...func(*EmployeeQuery)) *EmployeeQuery {
-	query := (&EmployeeClient{config: eq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	eq.withSupervisee = query
+	eq.withMission = query
 	return eq
 }
 
@@ -476,21 +369,11 @@ func (eq *EmployeeQuery) prepareQuery(ctx context.Context) error {
 func (eq *EmployeeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Employee, error) {
 	var (
 		nodes       = []*Employee{}
-		withFKs     = eq.withFKs
 		_spec       = eq.querySpec()
-		loadedTypes = [4]bool{
-			eq.withMissions != nil,
-			eq.withProjects != nil,
-			eq.withSuperviser != nil,
-			eq.withSupervisee != nil,
+		loadedTypes = [1]bool{
+			eq.withMission != nil,
 		}
 	)
-	if eq.withSuperviser != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, employee.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Employee).scanValues(nil, columns)
 	}
@@ -509,37 +392,17 @@ func (eq *EmployeeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Emp
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := eq.withMissions; query != nil {
-		if err := eq.loadMissions(ctx, query, nodes,
-			func(n *Employee) { n.Edges.Missions = []*Mission{} },
-			func(n *Employee, e *Mission) { n.Edges.Missions = append(n.Edges.Missions, e) }); err != nil {
-			return nil, err
-		}
-	}
-	if query := eq.withProjects; query != nil {
-		if err := eq.loadProjects(ctx, query, nodes,
-			func(n *Employee) { n.Edges.Projects = []*Project{} },
-			func(n *Employee, e *Project) { n.Edges.Projects = append(n.Edges.Projects, e) }); err != nil {
-			return nil, err
-		}
-	}
-	if query := eq.withSuperviser; query != nil {
-		if err := eq.loadSuperviser(ctx, query, nodes, nil,
-			func(n *Employee, e *Employee) { n.Edges.Superviser = e }); err != nil {
-			return nil, err
-		}
-	}
-	if query := eq.withSupervisee; query != nil {
-		if err := eq.loadSupervisee(ctx, query, nodes,
-			func(n *Employee) { n.Edges.Supervisee = []*Employee{} },
-			func(n *Employee, e *Employee) { n.Edges.Supervisee = append(n.Edges.Supervisee, e) }); err != nil {
+	if query := eq.withMission; query != nil {
+		if err := eq.loadMission(ctx, query, nodes,
+			func(n *Employee) { n.Edges.Mission = []*Mission{} },
+			func(n *Employee, e *Mission) { n.Edges.Mission = append(n.Edges.Mission, e) }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (eq *EmployeeQuery) loadMissions(ctx context.Context, query *MissionQuery, nodes []*Employee, init func(*Employee), assign func(*Employee, *Mission)) error {
+func (eq *EmployeeQuery) loadMission(ctx context.Context, query *MissionQuery, nodes []*Employee, init func(*Employee), assign func(*Employee, *Mission)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Employee)
 	for i := range nodes {
@@ -551,114 +414,20 @@ func (eq *EmployeeQuery) loadMissions(ctx context.Context, query *MissionQuery, 
 	}
 	query.withFKs = true
 	query.Where(predicate.Mission(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(employee.MissionsColumn), fks...))
+		s.Where(sql.InValues(s.C(employee.MissionColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.employee_missions
+		fk := n.mission_employee
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "employee_missions" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "mission_employee" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "employee_missions" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
-}
-func (eq *EmployeeQuery) loadProjects(ctx context.Context, query *ProjectQuery, nodes []*Employee, init func(*Employee), assign func(*Employee, *Project)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Employee)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	query.withFKs = true
-	query.Where(predicate.Project(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(employee.ProjectsColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.employee_projects
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "employee_projects" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "employee_projects" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
-}
-func (eq *EmployeeQuery) loadSuperviser(ctx context.Context, query *EmployeeQuery, nodes []*Employee, init func(*Employee), assign func(*Employee, *Employee)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Employee)
-	for i := range nodes {
-		if nodes[i].employee_supervisee == nil {
-			continue
-		}
-		fk := *nodes[i].employee_supervisee
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(employee.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "employee_supervisee" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
-}
-func (eq *EmployeeQuery) loadSupervisee(ctx context.Context, query *EmployeeQuery, nodes []*Employee, init func(*Employee), assign func(*Employee, *Employee)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Employee)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	query.withFKs = true
-	query.Where(predicate.Employee(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(employee.SuperviseeColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.employee_supervisee
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "employee_supervisee" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "employee_supervisee" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "mission_employee" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

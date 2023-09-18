@@ -35,10 +35,10 @@ type Mission struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MissionQuery when eager-loading is set.
-	Edges             MissionEdges `json:"edges"`
-	employee_missions *int
-	project_missions  *int
-	selectValues      sql.SelectValues
+	Edges            MissionEdges `json:"edges"`
+	mission_employee *int
+	mission_project  *int
+	selectValues     sql.SelectValues
 }
 
 // MissionEdges holds the relations/edges for other nodes in the graph.
@@ -89,9 +89,9 @@ func (*Mission) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case mission.FieldStartDate, mission.FieldEndDate, mission.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
-		case mission.ForeignKeys[0]: // employee_missions
+		case mission.ForeignKeys[0]: // mission_employee
 			values[i] = new(sql.NullInt64)
-		case mission.ForeignKeys[1]: // project_missions
+		case mission.ForeignKeys[1]: // mission_project
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -158,17 +158,17 @@ func (m *Mission) assignValues(columns []string, values []any) error {
 			}
 		case mission.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field employee_missions", value)
+				return fmt.Errorf("unexpected type %T for edge-field mission_employee", value)
 			} else if value.Valid {
-				m.employee_missions = new(int)
-				*m.employee_missions = int(value.Int64)
+				m.mission_employee = new(int)
+				*m.mission_employee = int(value.Int64)
 			}
 		case mission.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field project_missions", value)
+				return fmt.Errorf("unexpected type %T for edge-field mission_project", value)
 			} else if value.Valid {
-				m.project_missions = new(int)
-				*m.project_missions = int(value.Int64)
+				m.mission_project = new(int)
+				*m.mission_project = int(value.Int64)
 			}
 		default:
 			m.selectValues.Set(columns[i], values[i])

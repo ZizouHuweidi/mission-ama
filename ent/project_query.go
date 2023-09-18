@@ -24,7 +24,6 @@ type ProjectQuery struct {
 	inters       []Interceptor
 	predicates   []predicate.Project
 	withMissions *MissionQuery
-	withFKs      bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -75,7 +74,7 @@ func (pq *ProjectQuery) QueryMissions() *MissionQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(project.Table, project.FieldID, selector),
 			sqlgraph.To(mission.Table, mission.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, project.MissionsTable, project.MissionsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, project.MissionsTable, project.MissionsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
 		return fromU, nil
@@ -370,15 +369,11 @@ func (pq *ProjectQuery) prepareQuery(ctx context.Context) error {
 func (pq *ProjectQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Project, error) {
 	var (
 		nodes       = []*Project{}
-		withFKs     = pq.withFKs
 		_spec       = pq.querySpec()
 		loadedTypes = [1]bool{
 			pq.withMissions != nil,
 		}
 	)
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, project.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Project).scanValues(nil, columns)
 	}
@@ -426,13 +421,13 @@ func (pq *ProjectQuery) loadMissions(ctx context.Context, query *MissionQuery, n
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.project_missions
+		fk := n.mission_project
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "project_missions" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "mission_project" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "project_missions" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "mission_project" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

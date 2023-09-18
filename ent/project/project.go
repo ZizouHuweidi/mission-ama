@@ -30,7 +30,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "mission" package.
 	MissionsInverseTable = "missions"
 	// MissionsColumn is the table column denoting the missions relation/edge.
-	MissionsColumn = "project_missions"
+	MissionsColumn = "mission_project"
 )
 
 // Columns holds all SQL columns for project fields.
@@ -41,21 +41,10 @@ var Columns = []string{
 	FieldCreatedAt,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "projects"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"employee_projects",
-}
-
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -111,6 +100,6 @@ func newMissionsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(MissionsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, MissionsTable, MissionsColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, MissionsTable, MissionsColumn),
 	)
 }

@@ -161,7 +161,7 @@ func (pu *ProjectUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if pu.mutation.MissionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   project.MissionsTable,
 			Columns: []string{project.MissionsColumn},
 			Bidi:    false,
@@ -174,7 +174,7 @@ func (pu *ProjectUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := pu.mutation.RemovedMissionsIDs(); len(nodes) > 0 && !pu.mutation.MissionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   project.MissionsTable,
 			Columns: []string{project.MissionsColumn},
 			Bidi:    false,
@@ -190,7 +190,7 @@ func (pu *ProjectUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := pu.mutation.MissionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   project.MissionsTable,
 			Columns: []string{project.MissionsColumn},
 			Bidi:    false,
@@ -386,7 +386,7 @@ func (puo *ProjectUpdateOne) sqlSave(ctx context.Context) (_node *Project, err e
 	if puo.mutation.MissionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   project.MissionsTable,
 			Columns: []string{project.MissionsColumn},
 			Bidi:    false,
@@ -399,7 +399,7 @@ func (puo *ProjectUpdateOne) sqlSave(ctx context.Context) (_node *Project, err e
 	if nodes := puo.mutation.RemovedMissionsIDs(); len(nodes) > 0 && !puo.mutation.MissionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   project.MissionsTable,
 			Columns: []string{project.MissionsColumn},
 			Bidi:    false,
@@ -415,7 +415,7 @@ func (puo *ProjectUpdateOne) sqlSave(ctx context.Context) (_node *Project, err e
 	if nodes := puo.mutation.MissionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   project.MissionsTable,
 			Columns: []string{project.MissionsColumn},
 			Bidi:    false,

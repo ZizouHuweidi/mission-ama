@@ -24,38 +24,17 @@ const (
 	FieldOccupation = "occupation"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
-	// EdgeMissions holds the string denoting the missions edge name in mutations.
-	EdgeMissions = "missions"
-	// EdgeProjects holds the string denoting the projects edge name in mutations.
-	EdgeProjects = "projects"
-	// EdgeSuperviser holds the string denoting the superviser edge name in mutations.
-	EdgeSuperviser = "superviser"
-	// EdgeSupervisee holds the string denoting the supervisee edge name in mutations.
-	EdgeSupervisee = "supervisee"
+	// EdgeMission holds the string denoting the mission edge name in mutations.
+	EdgeMission = "mission"
 	// Table holds the table name of the employee in the database.
 	Table = "employees"
-	// MissionsTable is the table that holds the missions relation/edge.
-	MissionsTable = "missions"
-	// MissionsInverseTable is the table name for the Mission entity.
+	// MissionTable is the table that holds the mission relation/edge.
+	MissionTable = "missions"
+	// MissionInverseTable is the table name for the Mission entity.
 	// It exists in this package in order to avoid circular dependency with the "mission" package.
-	MissionsInverseTable = "missions"
-	// MissionsColumn is the table column denoting the missions relation/edge.
-	MissionsColumn = "employee_missions"
-	// ProjectsTable is the table that holds the projects relation/edge.
-	ProjectsTable = "projects"
-	// ProjectsInverseTable is the table name for the Project entity.
-	// It exists in this package in order to avoid circular dependency with the "project" package.
-	ProjectsInverseTable = "projects"
-	// ProjectsColumn is the table column denoting the projects relation/edge.
-	ProjectsColumn = "employee_projects"
-	// SuperviserTable is the table that holds the superviser relation/edge.
-	SuperviserTable = "employees"
-	// SuperviserColumn is the table column denoting the superviser relation/edge.
-	SuperviserColumn = "employee_supervisee"
-	// SuperviseeTable is the table that holds the supervisee relation/edge.
-	SuperviseeTable = "employees"
-	// SuperviseeColumn is the table column denoting the supervisee relation/edge.
-	SuperviseeColumn = "employee_supervisee"
+	MissionInverseTable = "missions"
+	// MissionColumn is the table column denoting the mission relation/edge.
+	MissionColumn = "mission_employee"
 )
 
 // Columns holds all SQL columns for employee fields.
@@ -68,21 +47,10 @@ var Columns = []string{
 	FieldCreatedAt,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "employees"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"employee_supervisee",
-}
-
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -133,79 +101,23 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
 }
 
-// ByMissionsCount orders the results by missions count.
-func ByMissionsCount(opts ...sql.OrderTermOption) OrderOption {
+// ByMissionCount orders the results by mission count.
+func ByMissionCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newMissionsStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newMissionStep(), opts...)
 	}
 }
 
-// ByMissions orders the results by missions terms.
-func ByMissions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByMission orders the results by mission terms.
+func ByMission(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newMissionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newMissionStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-
-// ByProjectsCount orders the results by projects count.
-func ByProjectsCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newProjectsStep(), opts...)
-	}
-}
-
-// ByProjects orders the results by projects terms.
-func ByProjects(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newProjectsStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// BySuperviserField orders the results by superviser field.
-func BySuperviserField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSuperviserStep(), sql.OrderByField(field, opts...))
-	}
-}
-
-// BySuperviseeCount orders the results by supervisee count.
-func BySuperviseeCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newSuperviseeStep(), opts...)
-	}
-}
-
-// BySupervisee orders the results by supervisee terms.
-func BySupervisee(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSuperviseeStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-func newMissionsStep() *sqlgraph.Step {
+func newMissionStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(MissionsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, MissionsTable, MissionsColumn),
-	)
-}
-func newProjectsStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ProjectsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, ProjectsTable, ProjectsColumn),
-	)
-}
-func newSuperviserStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(Table, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, SuperviserTable, SuperviserColumn),
-	)
-}
-func newSuperviseeStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(Table, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, SuperviseeTable, SuperviseeColumn),
+		sqlgraph.To(MissionInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, MissionTable, MissionColumn),
 	)
 }

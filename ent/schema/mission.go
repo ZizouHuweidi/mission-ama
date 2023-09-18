@@ -27,6 +27,7 @@ func (Mission) Fields() []ent.Field {
 		field.Time("endDate").
 			Optional(),
 		field.String("transport"),
+
 		field.Time("created_at").
 			Default(time.Now).
 			Immutable(),
@@ -36,11 +37,9 @@ func (Mission) Fields() []ent.Field {
 // Edges of the Mission.
 func (Mission) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("employee", Employee.Type).
-			Ref("missions").
+		edge.To("employee", Employee.Type).
 			Unique(),
-		edge.From("project", Project.Type).
-			Ref("missions").
+		edge.To("project", Project.Type).
 			Unique(),
 	}
 }

@@ -255,7 +255,7 @@ func HasMissions() predicate.Project {
 	return predicate.Project(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, MissionsTable, MissionsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, MissionsTable, MissionsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

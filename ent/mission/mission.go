@@ -40,14 +40,14 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "employee" package.
 	EmployeeInverseTable = "employees"
 	// EmployeeColumn is the table column denoting the employee relation/edge.
-	EmployeeColumn = "employee_missions"
+	EmployeeColumn = "mission_employee"
 	// ProjectTable is the table that holds the project relation/edge.
 	ProjectTable = "missions"
 	// ProjectInverseTable is the table name for the Project entity.
 	// It exists in this package in order to avoid circular dependency with the "project" package.
 	ProjectInverseTable = "projects"
 	// ProjectColumn is the table column denoting the project relation/edge.
-	ProjectColumn = "project_missions"
+	ProjectColumn = "mission_project"
 )
 
 // Columns holds all SQL columns for mission fields.
@@ -65,8 +65,8 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "missions"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"employee_missions",
-	"project_missions",
+	"mission_employee",
+	"mission_project",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -153,13 +153,13 @@ func newEmployeeStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EmployeeInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, EmployeeTable, EmployeeColumn),
+		sqlgraph.Edge(sqlgraph.M2O, false, EmployeeTable, EmployeeColumn),
 	)
 }
 func newProjectStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ProjectInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, ProjectTable, ProjectColumn),
+		sqlgraph.Edge(sqlgraph.M2O, false, ProjectTable, ProjectColumn),
 	)
 }

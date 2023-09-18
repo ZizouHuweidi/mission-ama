@@ -33,10 +33,7 @@ func (Employee) Fields() []ent.Field {
 // Edges of the Employee.
 func (Employee) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("missions", Mission.Type),
-		edge.To("projects", Project.Type),
-		edge.To("supervisee", Employee.Type).
-			From("superviser").
-			Unique(),
+		edge.From("mission", Mission.Type).
+			Ref("employee"),
 	}
 }

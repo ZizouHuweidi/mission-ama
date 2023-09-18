@@ -13,12 +13,11 @@ type (
 	}
 
 	employeeForm struct {
-		Name         string `form:"name" validate:"required"`
-		Phone        int    `form:"phone" validate:"required"`
-		CSP          bool   `form:"csp"`
-		Occupation   string `form:"occupation"`
-		SupervisorID int    `form:"supervisorID"`
-		Submission   controller.FormSubmission
+		Name       string `form:"name" validate:"required"`
+		Phone      int    `form:"phone" validate:"required"`
+		CSP        bool   `form:"csp"`
+		Occupation string `form:"occupation"`
+		Submission controller.FormSubmission
 	}
 )
 
@@ -27,7 +26,6 @@ func (c *employee) Get(ctx echo.Context) error {
 	page.Layout = "main"
 	page.Name = "employee"
 	page.Title = "New Employee"
-	// page.Data = c.fetchEmployees()
 	page.Form = employeeForm{}
 
 	if form := ctx.Get(context.FormKey); form != nil {
@@ -36,10 +34,6 @@ func (c *employee) Get(ctx echo.Context) error {
 
 	return c.RenderPage(ctx, page)
 }
-
-// func (c *employees) fetchEmployees() []string {
-//   e, err := c.Container.ORM.Employee.Query().All
-// }
 
 func (c *employee) Post(ctx echo.Context) error {
 	var form employeeForm
@@ -64,7 +58,6 @@ func (c *employee) Post(ctx echo.Context) error {
 		SetPhone(form.Phone).
 		SetCSP(form.CSP).
 		SetOccupation(form.Occupation).
-		SetSuperviserID(form.SupervisorID).
 		Save(ctx.Request().Context())
 
 	switch err.(type) {

@@ -310,90 +310,21 @@ func CreatedAtLTE(v time.Time) predicate.Employee {
 	return predicate.Employee(sql.FieldLTE(FieldCreatedAt, v))
 }
 
-// HasMissions applies the HasEdge predicate on the "missions" edge.
-func HasMissions() predicate.Employee {
+// HasMission applies the HasEdge predicate on the "mission" edge.
+func HasMission() predicate.Employee {
 	return predicate.Employee(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, MissionsTable, MissionsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, MissionTable, MissionColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasMissionsWith applies the HasEdge predicate on the "missions" edge with a given conditions (other predicates).
-func HasMissionsWith(preds ...predicate.Mission) predicate.Employee {
+// HasMissionWith applies the HasEdge predicate on the "mission" edge with a given conditions (other predicates).
+func HasMissionWith(preds ...predicate.Mission) predicate.Employee {
 	return predicate.Employee(func(s *sql.Selector) {
-		step := newMissionsStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasProjects applies the HasEdge predicate on the "projects" edge.
-func HasProjects() predicate.Employee {
-	return predicate.Employee(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ProjectsTable, ProjectsColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasProjectsWith applies the HasEdge predicate on the "projects" edge with a given conditions (other predicates).
-func HasProjectsWith(preds ...predicate.Project) predicate.Employee {
-	return predicate.Employee(func(s *sql.Selector) {
-		step := newProjectsStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasSuperviser applies the HasEdge predicate on the "superviser" edge.
-func HasSuperviser() predicate.Employee {
-	return predicate.Employee(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, SuperviserTable, SuperviserColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasSuperviserWith applies the HasEdge predicate on the "superviser" edge with a given conditions (other predicates).
-func HasSuperviserWith(preds ...predicate.Employee) predicate.Employee {
-	return predicate.Employee(func(s *sql.Selector) {
-		step := newSuperviserStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasSupervisee applies the HasEdge predicate on the "supervisee" edge.
-func HasSupervisee() predicate.Employee {
-	return predicate.Employee(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, SuperviseeTable, SuperviseeColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasSuperviseeWith applies the HasEdge predicate on the "supervisee" edge with a given conditions (other predicates).
-func HasSuperviseeWith(preds ...predicate.Employee) predicate.Employee {
-	return predicate.Employee(func(s *sql.Selector) {
-		step := newSuperviseeStep()
+		step := newMissionStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

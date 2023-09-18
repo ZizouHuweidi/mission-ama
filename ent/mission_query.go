@@ -76,7 +76,7 @@ func (mq *MissionQuery) QueryEmployee() *EmployeeQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(mission.Table, mission.FieldID, selector),
 			sqlgraph.To(employee.Table, employee.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, mission.EmployeeTable, mission.EmployeeColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, mission.EmployeeTable, mission.EmployeeColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
 		return fromU, nil
@@ -98,7 +98,7 @@ func (mq *MissionQuery) QueryProject() *ProjectQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(mission.Table, mission.FieldID, selector),
 			sqlgraph.To(project.Table, project.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, mission.ProjectTable, mission.ProjectColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, mission.ProjectTable, mission.ProjectColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
 		return fromU, nil
@@ -455,10 +455,10 @@ func (mq *MissionQuery) loadEmployee(ctx context.Context, query *EmployeeQuery, 
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Mission)
 	for i := range nodes {
-		if nodes[i].employee_missions == nil {
+		if nodes[i].mission_employee == nil {
 			continue
 		}
-		fk := *nodes[i].employee_missions
+		fk := *nodes[i].mission_employee
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -475,7 +475,7 @@ func (mq *MissionQuery) loadEmployee(ctx context.Context, query *EmployeeQuery, 
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "employee_missions" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "mission_employee" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -487,10 +487,10 @@ func (mq *MissionQuery) loadProject(ctx context.Context, query *ProjectQuery, no
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Mission)
 	for i := range nodes {
-		if nodes[i].project_missions == nil {
+		if nodes[i].mission_project == nil {
 			continue
 		}
-		fk := *nodes[i].project_missions
+		fk := *nodes[i].mission_project
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -507,7 +507,7 @@ func (mq *MissionQuery) loadProject(ctx context.Context, query *ProjectQuery, no
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "project_missions" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "mission_project" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
