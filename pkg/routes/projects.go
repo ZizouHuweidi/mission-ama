@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"fmt"
-
 	"github.com/labstack/echo/v4"
 
 	"github.com/zizouhuweidi/mission-ama/pkg/controller"
@@ -14,8 +12,8 @@ type (
 	}
 
 	projectTable struct {
-		Title string
-		Body  string
+		Name        string
+		Description string
 	}
 )
 
@@ -24,19 +22,8 @@ func (c *projects) Get(ctx echo.Context) error {
 	page.Layout = "main"
 	page.Name = "projects"
 	page.Title = "AMA Projects"
-	// page.Data = c.fetchProjects(ctx)
+
+	// page.Data
 
 	return c.RenderPage(ctx, page)
-}
-
-// fetchPosts is an mock example of fetching posts to illustrate how paging works
-func (c *projects) fetchProjects(ctx echo.Context) error {
-	p, err := c.Container.ORM.Project.Query().All(ctx.Request().Context())
-	if err != nil {
-		return c.Fail(err, "unable to fetch projects")
-	}
-
-	fmt.Print(p)
-
-	return c.Get(ctx)
 }

@@ -12,7 +12,7 @@ type (
 		controller.Controller
 	}
 
-	projectForm struct {
+	ProjectForm struct {
 		Name        string `form:"name" validate:"required"`
 		Description string `form:"name" validate:"required"`
 		Submission  controller.FormSubmission
@@ -24,17 +24,17 @@ func (c *project) Get(ctx echo.Context) error {
 	page.Layout = "main"
 	page.Name = "project"
 	page.Title = "New Project"
-	page.Form = projectForm{}
+	page.Form = ProjectForm{}
 
 	if form := ctx.Get(context.FormKey); form != nil {
-		page.Form = form.(*projectForm)
+		page.Form = form.(*ProjectForm)
 	}
 
 	return c.RenderPage(ctx, page)
 }
 
 func (c *project) Post(ctx echo.Context) error {
-	var form projectForm
+	var form ProjectForm
 	ctx.Set(context.FormKey, &form)
 
 	// Parse the form values
@@ -46,21 +46,22 @@ func (c *project) Post(ctx echo.Context) error {
 		return c.Fail(err, "unable to process form submission")
 	}
 
+	if !form.Submission.HasErrors() {
+		e, err := c.Container.ORM.Project.
+			Create().
+			SetName(form.Name).
+			SetDescription(form.Description).
+			Save(ctx.Request().Context())
+
+		switch err.(type) {
+		case nil:
+			ctx.Logger().Infof("Project created: %s", e.Name)
+		default:
+			return c.Fail(err, "unable to create project")
+		}
+	}
 	if form.Submission.HasErrors() {
 		return c.Get(ctx)
-	}
-
-	e, err := c.Container.ORM.Project.
-		Create().
-		SetName(form.Name).
-		SetDescription(form.Description).
-		Save(ctx.Request().Context())
-
-	switch err.(type) {
-	case nil:
-		ctx.Logger().Infof("Project created: %s", e.Name)
-	default:
-		return c.Fail(err, "unable to create project")
 	}
 
 	return c.Get(ctx)

@@ -1,51 +1,30 @@
-{{define "content"}}
-
-<form id="project" method="post" hx-post="{{call .ToURL "project.post"}}">
-
-
-
+{{define "content"}} {{- if .Form.Submission.IsDone}}
+<article class="message is-large is-success">
+  <div class="message-header">
+    <p>Thank you!</p>
+  </div>
+  <div class="message-body">Your project is submitted</div>
+</article>
+{{- else}}
+<form id="project" method="post" action="{{call .ToURL "project.post"}}">
   <div class="field">
     <label class="label">Name</label>
     <div class="control">
-      <input class="input" type="text" >
-    </div>
-  </div>
-
-
-  <div class="field">
-    <label class="label">Phone</label>
-    <div class="control">
-      <input class="input" type="number" >
+      <input class="input" type="text" value="{{.Form.Name}}" />
     </div>
   </div>
 
   <div class="field">
-    <label class="label">Occupation</label>
+    <label class="label">Description</label>
     <div class="control">
-      <div class="select">
-        <select>
-          <option value="Finance">Finance</option>
-          <option value="DG">DG</option>
-          <option value="Sales">Sales</option>
-          <option value="Quality">Quality</option>
-          <option value="Construction">Construction</option>
-          <option value="Commercial">Commercial</option>
-        </select>
-      </div>
+      <textarea
+        id="Description"
+        name="Description"
+        class="textarea"
+        value="{{.Form.Description}}"
+      ></textarea>
     </div>
   </div>
-
-
-
-  <div class="field">
-    <div class="control">
-      <label class="checkbox">
-        <input type="checkbox">
-        CSP
-      </label>
-    </div>
-  </div>
-
 
   <div class="field is-grouped">
     <div class="control">
@@ -55,7 +34,6 @@
       <button class="button is-link is-light">Cancel</button>
     </div>
   </div>
-
+  {{template "csrf" .}}
 </form>
-
-{{end}}
+{{- end}} {{end}}
