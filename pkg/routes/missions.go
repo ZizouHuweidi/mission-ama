@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"fmt"
-
 	"github.com/labstack/echo/v4"
 
 	"github.com/zizouhuweidi/mission-ama/pkg/controller"
@@ -14,8 +12,13 @@ type (
 	}
 
 	missionTable struct {
-		Title string
-		Body  string
+		Name        string
+		Purpose     string
+		Destination string
+		StartDate   string
+		EndDate     string
+		Transport   string
+		Created_at  string
 	}
 )
 
@@ -24,19 +27,33 @@ func (c *missions) Get(ctx echo.Context) error {
 	page.Layout = "main"
 	page.Name = "missions"
 	page.Title = "AMA Missions"
-	// page.Data = c.fetchMissions(ctx)
+	page.Data = c.fetchMissions(ctx)
 
 	return c.RenderPage(ctx, page)
 }
 
-// fetchPosts is an mock example of fetching posts to illustrate how paging works
-func (c *missions) fetchMissions(ctx echo.Context) error {
-	m, err := c.Container.ORM.Mission.Query().All(ctx.Request().Context())
+func (c *missions) fetchMissions(ctx echo.Context) []missionTable {
+	mis, err := c.Container.ORM.Mission.Query().All(ctx.Request().Context())
 	if err != nil {
-		return c.Fail(err, "unable to fetch missions")
+		ctx.Logger().Errorf("failed querying missions: %v", err)
+		return nil
 	}
 
-	fmt.Print(m)
+	missionData := make([]missionTable, len(mis))
+	for i, mi := range mis {
 
-	return c.Get(ctx)
+		missionData[i] = missionTable{
+			Name:        mi.Name,
+			Purpose:     mi.Purpose,
+			Destination: mi.Destination,
+			StartDate:   mi.StartDate.String(),
+			EndDate:     mi.EndDate.String(),
+			Transport:   mi.Transport,
+			Created_at:  mi.CreatedAt.String(),
+		}
+		ctx.Logger().Infof("Mission found: %s", mi.Name)
+	}
+
+	return missionData
+
 }

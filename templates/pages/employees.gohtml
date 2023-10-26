@@ -1,0 +1,12 @@
+{{define "content"}}
+<section class="section">
+  <h1 class="title">Employees</h1>
+</section>
+  {{- range .Data}}
+    <li>{{.Name}}</li>
+    <li>{{.Phone}}</li>
+    <li>{{.CSP}}</li>
+    <li>{{.Occupation}}</li>
+    <li>{{.Created_at}}</li>
+  {{- end }}
+{{end}}

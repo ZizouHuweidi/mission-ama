@@ -1,0 +1,15 @@
+{{define "content"}}
+
+<section class="section">
+  <h1 class="title">Missions</h1>
+</section>
+  {{- range .Data}}
+    <li>{{.Name}}</li>
+    <li>{{.Purpose}}</li>
+    <li>{{.Destination}}</li>
+    <li>{{.StartDate}}</li>
+    <li>{{.EndDate}}</li>
+    <li>{{.Transport}}</li>
+    <li>{{.Created_at}}</li>
+  {{- end }}
+{{end}}
