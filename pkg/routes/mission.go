@@ -14,12 +14,12 @@ type (
 
 	missionForm struct {
 		Name        string `form:"name" validate:"required"`
-		Purpose     string `form:"purpose"`
-		Destination string `form:"destination"`
-		startDate   string `form:"startDate"`
-		endDate     string `form:"endDate"`
-		Transport   string `form:"transport"`
-		EmployeeID  int    `form:"projectID"`
+		Purpose     string `form:"purpose" validate:"required"`
+		Destination string `form:"destination" validate:"required"`
+		startDate   string `form:"startDate" validate:"required"`
+		endDate     string `form:"endDate" validate:"required"`
+		Transport   string `form:"transport" validate:"required"`
+		EmployeeID  int    `form:"projectID" validate:"required"`
 		ProjectID   int    `form:"projectID"`
 		Submission  controller.FormSubmission
 	}

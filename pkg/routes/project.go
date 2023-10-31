@@ -14,7 +14,7 @@ type (
 
 	ProjectForm struct {
 		Name        string `form:"name" validate:"required"`
-		Description string `form:"name" validate:"required"`
+		Description string `form:"description" validate:"required"`
 		Submission  controller.FormSubmission
 	}
 )
