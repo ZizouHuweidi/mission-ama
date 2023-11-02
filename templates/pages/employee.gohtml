@@ -1,10 +1,10 @@
 {{define "content"}}
-<form id="employee" method="post" hx-post="{{call .ToURL "employee.post"}}">
+<form  method="post" hx-boost="true" action="{{call .ToURL "employee.post"}}">
 
  <div class="field">
   <label class="label">Name</label>
   <div class="control">
-    <input class="input" type="text" >
+    <input class="input" type="text" value="{{.Form.Name}}" >
   </div>
 </div>
 
@@ -12,22 +12,14 @@
   <div class="field">
     <label class="label">Phone</label>
     <div class="control">
-      <input class="input" type="number" >
+      <input class="input" type="number" value="{{.Form.Phone}}">
     </div>
   </div>
 
 <div class="field">
   <label class="label">Occupation</label>
   <div class="control">
-    <div class="select">
-      <select>
-        <option value="Finance">Finance</option>
-        <option value="DG">DG</option>
-        <option value="Sales">Sales</option>
-        <option value="Quality">Quality</option>
-        <option value="Construction">Construction</option>
-        <option value="Commercial">Commercial</option>
-      </select>
+    <input class="input" type="text" value="{{.Form.Occupation}}" >
     </div>
   </div>
 </div>
@@ -35,8 +27,8 @@
 <div class="field">
   <div class="control">
     <label class="checkbox">
-      <input type="checkbox">
-      CSP
+        <input type="checkbox" name="{{.Form.CSP}}" value="true">
+      Has CSP
     </label>
   </div>
 </div>
@@ -45,9 +37,6 @@
 <div class="field is-grouped">
   <div class="control">
     <button class="button is-link">Submit</button>
-  </div>
-  <div class="control">
-    <button class="button is-link is-light">Cancel</button>
   </div>
 </div>
 

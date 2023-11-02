@@ -2,6 +2,7 @@ package routes
 
 import (
 	"github.com/labstack/echo/v4"
+	"github.com/zizouhuweidi/mission-ama/ent"
 
 	"github.com/zizouhuweidi/mission-ama/pkg/context"
 	"github.com/zizouhuweidi/mission-ama/pkg/controller"
@@ -23,6 +24,11 @@ type (
 		ProjectID   int    `form:"projectID"`
 		Submission  controller.FormSubmission
 	}
+
+	pageData struct {
+		Projects  []ent.Project
+		Employees []ent.Employee
+	}
 )
 
 func (c *mission) Get(ctx echo.Context) error {
@@ -40,11 +46,9 @@ func (c *mission) Get(ctx echo.Context) error {
 	return c.RenderPage(ctx, page)
 }
 
-// func (c *mission) fetch(ctx echo.Context) error {
-//   m, err := c.Container.ORM.Project.Query().All
-//   e, err := c.Container.ORM.Employee.Query().All
-//
-// }
+func (c *mission) fetch(ctx echo.Context) {
+
+}
 
 func (c *mission) Post(ctx echo.Context) error {
 	var form missionForm

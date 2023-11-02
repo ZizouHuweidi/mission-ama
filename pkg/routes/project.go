@@ -12,7 +12,7 @@ type (
 		controller.Controller
 	}
 
-	ProjectForm struct {
+	projectForm struct {
 		Name        string `form:"name" validate:"required"`
 		Description string `form:"description" validate:"required"`
 		Submission  controller.FormSubmission
@@ -24,17 +24,17 @@ func (c *project) Get(ctx echo.Context) error {
 	page.Layout = "main"
 	page.Name = "project"
 	page.Title = "New Project"
-	page.Form = ProjectForm{}
+	page.Form = projectForm{}
 
 	if form := ctx.Get(context.FormKey); form != nil {
-		page.Form = form.(*ProjectForm)
+		page.Form = form.(*projectForm)
 	}
 
 	return c.RenderPage(ctx, page)
 }
 
 func (c *project) Post(ctx echo.Context) error {
-	var form ProjectForm
+	var form projectForm
 	ctx.Set(context.FormKey, &form)
 
 	// Parse the form values
