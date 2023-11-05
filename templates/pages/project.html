@@ -1,30 +1,28 @@
 {{define "content"}}
-    <form method="post" hx-boost="true" action="{{call .ToURL "project.post"}}">
+<form method="post" hx-boost="true" action="{{call .ToURL " project.post"}}">
 
-        <div class="field">
-            <label for="name" class="label">Name</label>
-            <div class="control">
-                <input type="text" id="name" name="name" class="input"
-                       value="{{.Form.Name}}">
-            </div>
+    <div class="field">
+        <label for="name" class="label">Name</label>
+        <div class="control">
+            <input type="text" id="name" name="name" class="input" value="{{.Form.Name}}">
         </div>
+    </div>
 
-        <div class="field">
-            <label for="description" class="label">Description</label>
-            <div class="control">
-                <input type="text" id="description" name="description" class="input"
-                       value="{{.Form.Description}}">
-            </div>
+    <div class="field">
+        <label for="description" class="label">Description</label>
+        <div class="control">
+            <input type="text" id="description" name="description" class="input" value="{{.Form.Description}}">
         </div>
+    </div>
 
-        <div class="field is-grouped">
-            <div class="control">
-                <button class="button is-link">Submit</button>
-            </div>
-            <div class="control">
-                <button class="button is-link is-light">Cancel</button>
-            </div>
+    <div class="field is-grouped">
+        <div class="control">
+            <button class="button is-link">Submit</button>
         </div>
-        {{template "csrf" .}}
-    </form>
+        <div class="control">
+            <button class="button is-link is-light">Cancel</button>
+        </div>
+    </div>
+    {{template "csrf" .}}
+</form>
 {{end}}
