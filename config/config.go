@@ -13,7 +13,7 @@ const (
 	TemplateDir = "../templates"
 
 	// TemplateExt stores the extension used for the template files
-	TemplateExt = ".gohtml"
+	TemplateExt = ".html"
 
 	// StaticDir stores the name of the directory that will serve static files
 	StaticDir = "static"
