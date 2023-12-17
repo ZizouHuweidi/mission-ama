@@ -22,12 +22,20 @@ func (Mission) Fields() []ent.Field {
 			Optional(),
 		field.String("destination").
 			NotEmpty(),
+    field.Enum("department").
+      Values("HR", "Finance", "Sales", "Marketing", "Logistics", "Quality", "Construction", "Other").
+      Default("Other"),
 		field.Time("startDate").
 			Optional(),
 		field.Time("endDate").
 			Optional(),
-		field.String("transport"),
-
+		field.Enum("transport").
+      Values("car", "plane", "train", "bus", "boat").
+      Default("car"),
+    field.Int("cost"),
+    field.Enum("status").
+      Values("pending", "approved", "rejected").
+      Default("pending"),
 		field.Time("created_at").
 			Default(time.Now).
 			Immutable(),
